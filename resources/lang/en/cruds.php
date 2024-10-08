@@ -334,8 +334,8 @@ return [
         ],
     ],
     'invoiceDerail' => [
-        'title'          => 'Invoice Derail',
-        'title_singular' => 'Invoice Derail',
+        'title'          => 'Invoice Detail',
+        'title_singular' => 'Invoice Detail',
         'fields'         => [
             'id'                     => 'ID',
             'id_helper'              => ' ',
