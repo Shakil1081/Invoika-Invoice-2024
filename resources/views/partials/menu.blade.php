@@ -18,18 +18,16 @@
         @can('company_access')
             <li class="c-sidebar-nav-dropdown {{ request()->is("admin/company-lists*") ? "c-show" : "" }} {{ request()->is("admin/billing-addresses*") ? "c-show" : "" }} {{ request()->is("admin/shipping-addresses*") ? "c-show" : "" }} {{ request()->is("admin/client-lists*") ? "c-show" : "" }}">
                 <a class="c-sidebar-nav-dropdown-toggle" href="#">
-                    <i class="fa-fw fas fa-cogs c-sidebar-nav-icon">
+                    <i class="fa-fw fas fa-building c-sidebar-nav-icon"></i>
 
-                    </i>
                     {{ trans('cruds.company.title') }}
                 </a>
                 <ul class="c-sidebar-nav-dropdown-items">
                     @can('company_list_access')
                         <li class="c-sidebar-nav-item">
                             <a href="{{ route("admin.company-lists.index") }}" class="c-sidebar-nav-link {{ request()->is("admin/company-lists") || request()->is("admin/company-lists/*") ? "c-active" : "" }}">
-                                <i class="fa-fw fas fa-cogs c-sidebar-nav-icon">
+                                <i class="fa-fw fas fa-briefcase c-sidebar-nav-icon"></i>
 
-                                </i>
                                 {{ trans('cruds.companyList.title') }}
                             </a>
                         </li>
@@ -37,7 +35,7 @@
                     @can('billing_address_access')
                         <li class="c-sidebar-nav-item">
                             <a href="{{ route("admin.billing-addresses.index") }}" class="c-sidebar-nav-link {{ request()->is("admin/billing-addresses") || request()->is("admin/billing-addresses/*") ? "c-active" : "" }}">
-                                <i class="fa-fw fas fa-cogs c-sidebar-nav-icon">
+                                <i class="fa-fw fas fa-address-card c-sidebar-nav-icon"></i>
 
                                 </i>
                                 {{ trans('cruds.billingAddress.title') }}
@@ -47,9 +45,7 @@
                     @can('shipping_address_access')
                         <li class="c-sidebar-nav-item">
                             <a href="{{ route("admin.shipping-addresses.index") }}" class="c-sidebar-nav-link {{ request()->is("admin/shipping-addresses") || request()->is("admin/shipping-addresses/*") ? "c-active" : "" }}">
-                                <i class="fa-fw fas fa-cogs c-sidebar-nav-icon">
-
-                                </i>
+                                <i class="fa-fw fas fa-address-card c-sidebar-nav-icon"></i>
                                 {{ trans('cruds.shippingAddress.title') }}
                             </a>
                         </li>
@@ -57,9 +53,7 @@
                     @can('client_list_access')
                         <li class="c-sidebar-nav-item">
                             <a href="{{ route("admin.client-lists.index") }}" class="c-sidebar-nav-link {{ request()->is("admin/client-lists") || request()->is("admin/client-lists/*") ? "c-active" : "" }}">
-                                <i class="fa-fw fas fa-cogs c-sidebar-nav-icon">
-
-                                </i>
+                                <i class="fa-fw fas fa-user-friends c-sidebar-nav-icon"></i>
                                 {{ trans('cruds.clientList.title') }}
                             </a>
                         </li>
@@ -70,18 +64,16 @@
         @can('invoice_access')
             <li class="c-sidebar-nav-dropdown {{ request()->is("admin/add-invoice-masters*") ? "c-show" : "" }} {{ request()->is("admin/invoice-derails*") ? "c-show" : "" }}">
                 <a class="c-sidebar-nav-dropdown-toggle" href="#">
-                    <i class="fa-fw fas fa-cogs c-sidebar-nav-icon">
+                    <i class="fa-fw fas fa-file-invoice c-sidebar-nav-icon"></i>
 
-                    </i>
                     {{ trans('cruds.invoice.title') }}
                 </a>
                 <ul class="c-sidebar-nav-dropdown-items">
                     @can('add_invoice_master_access')
                         <li class="c-sidebar-nav-item">
                             <a href="{{ route("admin.add-invoice-masters.index") }}" class="c-sidebar-nav-link {{ request()->is("admin/add-invoice-masters") || request()->is("admin/add-invoice-masters/*") ? "c-active" : "" }}">
-                                <i class="fa-fw fas fa-cogs c-sidebar-nav-icon">
+                                <i class="fa-fw fas fa-plus-circle c-sidebar-nav-icon"></i>
 
-                                </i>
                                 {{ trans('cruds.addInvoiceMaster.title') }}
                             </a>
                         </li>
@@ -89,9 +81,7 @@
                     @can('invoice_derail_access')
                         <li class="c-sidebar-nav-item">
                             <a href="{{ route("admin.invoice-derails.index") }}" class="c-sidebar-nav-link {{ request()->is("admin/invoice-derails") || request()->is("admin/invoice-derails/*") ? "c-active" : "" }}">
-                                <i class="fa-fw fas fa-cogs c-sidebar-nav-icon">
-
-                                </i>
+                                <i class="fa-fw fas fa-file-invoice c-sidebar-nav-icon"></i>
                                 {{ trans('cruds.invoiceDerail.title') }}
                             </a>
                         </li>
@@ -102,18 +92,14 @@
         @can('payment_access')
             <li class="c-sidebar-nav-dropdown {{ request()->is("admin/payment-statuses*") ? "c-show" : "" }} {{ request()->is("admin/payment-types*") ? "c-show" : "" }}">
                 <a class="c-sidebar-nav-dropdown-toggle" href="#">
-                    <i class="fa-fw fas fa-cogs c-sidebar-nav-icon">
-
-                    </i>
+                    <i class="fa-fw fas fa-money-bill c-sidebar-nav-icon"></i>
                     {{ trans('cruds.payment.title') }}
                 </a>
                 <ul class="c-sidebar-nav-dropdown-items">
                     @can('payment_status_access')
                         <li class="c-sidebar-nav-item">
                             <a href="{{ route("admin.payment-statuses.index") }}" class="c-sidebar-nav-link {{ request()->is("admin/payment-statuses") || request()->is("admin/payment-statuses/*") ? "c-active" : "" }}">
-                                <i class="fa-fw fas fa-cogs c-sidebar-nav-icon">
-
-                                </i>
+                                <i class="fa-fw fas fa-credit-card c-sidebar-nav-icon"></i>
                                 {{ trans('cruds.paymentStatus.title') }}
                             </a>
                         </li>
@@ -121,9 +107,7 @@
                     @can('payment_type_access')
                         <li class="c-sidebar-nav-item">
                             <a href="{{ route("admin.payment-types.index") }}" class="c-sidebar-nav-link {{ request()->is("admin/payment-types") || request()->is("admin/payment-types/*") ? "c-active" : "" }}">
-                                <i class="fa-fw fas fa-cogs c-sidebar-nav-icon">
-
-                                </i>
+                                <i class="fa-fw fas fa-credit-card c-sidebar-nav-icon"></i>
                                 {{ trans('cruds.paymentType.title') }}
                             </a>
                         </li>
@@ -134,18 +118,14 @@
         @can('product_detail_access')
             <li class="c-sidebar-nav-dropdown {{ request()->is("admin/colors*") ? "c-show" : "" }} {{ request()->is("admin/category-lists*") ? "c-show" : "" }} {{ request()->is("admin/brand-lists*") ? "c-show" : "" }} {{ request()->is("admin/products*") ? "c-show" : "" }}">
                 <a class="c-sidebar-nav-dropdown-toggle" href="#">
-                    <i class="fa-fw fas fa-cogs c-sidebar-nav-icon">
-
-                    </i>
+                    <i class="fa-fw fas fa-box c-sidebar-nav-icon"></i>
                     {{ trans('cruds.productDetail.title') }}
                 </a>
                 <ul class="c-sidebar-nav-dropdown-items">
                     @can('color_access')
                         <li class="c-sidebar-nav-item">
                             <a href="{{ route("admin.colors.index") }}" class="c-sidebar-nav-link {{ request()->is("admin/colors") || request()->is("admin/colors/*") ? "c-active" : "" }}">
-                                <i class="fa-fw fas fa-cogs c-sidebar-nav-icon">
-
-                                </i>
+                                <i class="fa-fw fas fa-paint-brush c-sidebar-nav-icon"></i>
                                 {{ trans('cruds.color.title') }}
                             </a>
                         </li>
@@ -153,9 +133,7 @@
                     @can('category_list_access')
                         <li class="c-sidebar-nav-item">
                             <a href="{{ route("admin.category-lists.index") }}" class="c-sidebar-nav-link {{ request()->is("admin/category-lists") || request()->is("admin/category-lists/*") ? "c-active" : "" }}">
-                                <i class="fa-fw fas fa-cogs c-sidebar-nav-icon">
-
-                                </i>
+                                <i class="fa-fw fas fa-th-list c-sidebar-nav-icon"></i>
                                 {{ trans('cruds.categoryList.title') }}
                             </a>
                         </li>
@@ -163,9 +141,7 @@
                     @can('brand_list_access')
                         <li class="c-sidebar-nav-item">
                             <a href="{{ route("admin.brand-lists.index") }}" class="c-sidebar-nav-link {{ request()->is("admin/brand-lists") || request()->is("admin/brand-lists/*") ? "c-active" : "" }}">
-                                <i class="fa-fw fas fa-cogs c-sidebar-nav-icon">
-
-                                </i>
+                                <i class="fa-fw fas fa-th-list c-sidebar-nav-icon"></i>
                                 {{ trans('cruds.brandList.title') }}
                             </a>
                         </li>
@@ -173,9 +149,7 @@
                     @can('product_access')
                         <li class="c-sidebar-nav-item">
                             <a href="{{ route("admin.products.index") }}" class="c-sidebar-nav-link {{ request()->is("admin/products") || request()->is("admin/products/*") ? "c-active" : "" }}">
-                                <i class="fa-fw fas fa-shopping-cart c-sidebar-nav-icon">
-
-                                </i>
+                                <i class="fa-fw fas fa-box-open c-sidebar-nav-icon"></i>
                                 {{ trans('cruds.product.title') }}
                             </a>
                         </li>
@@ -238,18 +212,16 @@
         @can('tax_access')
             <li class="c-sidebar-nav-dropdown {{ request()->is("admin/tax-lists*") ? "c-show" : "" }} {{ request()->is("admin/discounts*") ? "c-show" : "" }} {{ request()->is("admin/shipping-charges*") ? "c-show" : "" }}">
                 <a class="c-sidebar-nav-dropdown-toggle" href="#">
-                    <i class="fa-fw fas fa-cogs c-sidebar-nav-icon">
+                    <i class="fa-fw fas fa-percent c-sidebar-nav-icon"></i>
 
-                    </i>
                     {{ trans('cruds.tax.title') }}
                 </a>
                 <ul class="c-sidebar-nav-dropdown-items">
                     @can('tax_list_access')
                         <li class="c-sidebar-nav-item">
                             <a href="{{ route("admin.tax-lists.index") }}" class="c-sidebar-nav-link {{ request()->is("admin/tax-lists") || request()->is("admin/tax-lists/*") ? "c-active" : "" }}">
-                                <i class="fa-fw fas fa-cogs c-sidebar-nav-icon">
+                                <i class="fa-fw fas fa-money-bill c-sidebar-nav-icon"></i>
 
-                                </i>
                                 {{ trans('cruds.taxList.title') }}
                             </a>
                         </li>
@@ -257,9 +229,7 @@
                     @can('discount_access')
                         <li class="c-sidebar-nav-item">
                             <a href="{{ route("admin.discounts.index") }}" class="c-sidebar-nav-link {{ request()->is("admin/discounts") || request()->is("admin/discounts/*") ? "c-active" : "" }}">
-                                <i class="fa-fw fas fa-cogs c-sidebar-nav-icon">
-
-                                </i>
+                                <i class="fa-fw fas fa-tags c-sidebar-nav-icon"></i>
                                 {{ trans('cruds.discount.title') }}
                             </a>
                         </li>
@@ -267,9 +237,7 @@
                     @can('shipping_charge_access')
                         <li class="c-sidebar-nav-item">
                             <a href="{{ route("admin.shipping-charges.index") }}" class="c-sidebar-nav-link {{ request()->is("admin/shipping-charges") || request()->is("admin/shipping-charges/*") ? "c-active" : "" }}">
-                                <i class="fa-fw fas fa-cogs c-sidebar-nav-icon">
-
-                                </i>
+                                <i class="fa-fw fas fa-shipping-fast c-sidebar-nav-icon"></i>
                                 {{ trans('cruds.shippingCharge.title') }}
                             </a>
                         </li>
