@@ -17,6 +17,7 @@ class InvoiceDetailsTableSeeder extends Seeder
     {
         $data = [
             [
+                'invoice_id' => 1,
                 'rate' => 150.00,
                 'quantity' => '2',
                 'product_details' => 'Product 1 description',
@@ -25,6 +26,7 @@ class InvoiceDetailsTableSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
+                'invoice_id' => 1,
                 'rate' => 200.00,
                 'quantity' => '3',
                 'product_details' => 'Product 2 description',
@@ -33,7 +35,8 @@ class InvoiceDetailsTableSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'rate' => 120.50,
+                'invoice_id' => 2,
+                'rate' => 200.00,
                 'quantity' => '5',
                 'product_details' => 'Product 3 description',
                 'amount' => 602.50,

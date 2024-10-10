@@ -28,22 +28,22 @@ class AddInvoiceMasterController extends Controller
         return view('admin.addInvoiceMasters.index', compact('addInvoiceMasters'));
     }
 
+//    public function create()
+//    {
+//        abort_if(Gate::denies('add_invoice_master_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+//
+//        $select_clients = CompanyList::pluck('company_name', 'id')->prepend(trans('global.pleaseSelect'), '');
+//
+//        $payment_statuses = PaymentStatus::pluck('payment_status', 'id')->prepend(trans('global.pleaseSelect'), '');
+//
+//        $billing_addresses = BillingAddress::pluck('full_name', 'id')->prepend(trans('global.pleaseSelect'), '');
+//
+//        $shipping_addresses = ShippingAddress::pluck('shipping_name', 'id')->prepend(trans('global.pleaseSelect'), '');
+//
+//        return view('admin.addInvoiceMasters.create', compact('billing_addresses', 'payment_statuses', 'select_clients', 'shipping_addresses'));
+//    }
+
     public function create()
-    {
-        abort_if(Gate::denies('add_invoice_master_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-
-        $select_clients = CompanyList::pluck('company_name', 'id')->prepend(trans('global.pleaseSelect'), '');
-
-        $payment_statuses = PaymentStatus::pluck('payment_status', 'id')->prepend(trans('global.pleaseSelect'), '');
-
-        $billing_addresses = BillingAddress::pluck('full_name', 'id')->prepend(trans('global.pleaseSelect'), '');
-
-        $shipping_addresses = ShippingAddress::pluck('shipping_name', 'id')->prepend(trans('global.pleaseSelect'), '');
-
-        return view('admin.addInvoiceMasters.create', compact('billing_addresses', 'payment_statuses', 'select_clients', 'shipping_addresses'));
-    }
-
-    public function createWithDetails()
     {
         abort_if(Gate::denies('add_invoice_master_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
@@ -57,18 +57,20 @@ class AddInvoiceMasterController extends Controller
 
         $products = Product::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        return view('admin.addInvoiceMasters.create_with_details', compact('billing_addresses', 'payment_statuses', 'select_clients', 'shipping_addresses','products'));
+        return view('admin.addInvoiceMasters.create', compact('billing_addresses', 'payment_statuses', 'select_clients', 'shipping_addresses','products'));
     }
+
+//    public function store(StoreAddInvoiceMasterRequest $request)
+//    {
+//        $addInvoiceMaster = AddInvoiceMaster::create($request->all());
+//
+//        return redirect()->route('admin.add-invoice-masters.index');
+//    }
 
     public function store(StoreAddInvoiceMasterRequest $request)
     {
         $addInvoiceMaster = AddInvoiceMaster::create($request->all());
 
-        return redirect()->route('admin.add-invoice-masters.index');
-    }
-
-    public function storeWithDetails(StoreAddInvoiceMasterRequest $request)
-    {
         $productIds = request('product_id');
         $rates = request('rate');
         $quantities = request('quantity');
@@ -79,6 +81,7 @@ class AddInvoiceMasterController extends Controller
 
         for ($i = 0; $i < count($productIds); $i++) {
             $invoiceDetailsList[] = [
+                'invoice_id' => $addInvoiceMaster->id,
                 'product_id' => $productIds[$i],
                 'rate' => $rates[$i],
                 'quantity' => $quantities[$i],
@@ -91,7 +94,7 @@ class AddInvoiceMasterController extends Controller
             InvoiceDerail::create($invoiceDetails);
         }
 
-        AddInvoiceMaster::create($request->all());
+        return redirect()->route('admin.add-invoice-masters.index');
     }
 
     public function edit(AddInvoiceMaster $addInvoiceMaster)
@@ -106,17 +109,61 @@ class AddInvoiceMasterController extends Controller
 
         $shipping_addresses = ShippingAddress::pluck('shipping_name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        $addInvoiceMaster->load('select_client', 'payment_status', 'billing_address', 'shipping_address');
+        $products = Product::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        return view('admin.addInvoiceMasters.edit', compact('addInvoiceMaster', 'billing_addresses', 'payment_statuses', 'select_clients', 'shipping_addresses'));
+        $addInvoiceMaster->load('select_client', 'payment_status', 'billing_address', 'shipping_address','invoice_details');
+
+        return view('admin.addInvoiceMasters.edit', compact('addInvoiceMaster', 'billing_addresses', 'payment_statuses', 'select_clients', 'shipping_addresses','products'));
     }
 
-    public function update(UpdateAddInvoiceMasterRequest $request, AddInvoiceMaster $addInvoiceMaster)
+    public function update(StoreAddInvoiceMasterRequest $request, AddInvoiceMaster $addInvoiceMaster)
     {
         $addInvoiceMaster->update($request->all());
 
+        $existingInvoiceDetailIds = $addInvoiceMaster->invoice_details->pluck('id')->toArray();
+
+        $productIds = $request->input('product_id');
+        $rates = $request->input('rate');
+        $quantities = $request->input('quantity');
+        $productDetails = $request->input('product_details');
+        $amounts = $request->input('amount');
+        $invoiceDetailIds = $request->input('invoice_detail_ids');
+
+        $invoiceDetailsList = [];
+
+        for ($i = 0; $i < count($productIds); $i++) {
+            $invoiceDetailsList[] = [
+                'product_id' => $productIds[$i],
+                'rate' => $rates[$i],
+                'quantity' => $quantities[$i],
+                'product_details' => $productDetails[$i],
+                'amount' => $amounts[$i],
+            ];
+        }
+
+        $updatedInvoiceDetailIds = [];
+
+        foreach ($invoiceDetailsList as $index => $invoiceDetails) {
+            if (isset($invoiceDetailIds[$index])) {
+                $invoiceDerail = InvoiceDerail::find($invoiceDetailIds[$index]);
+                if ($invoiceDerail) {
+                    $invoiceDerail->update($invoiceDetails);
+                    $updatedInvoiceDetailIds[] = $invoiceDetailIds[$index];
+                }
+            } else {
+                $invoiceDetails['invoice_id'] = $addInvoiceMaster->id;
+                InvoiceDerail::create($invoiceDetails);
+            }
+        }
+
+        $idsToDelete = array_diff($existingInvoiceDetailIds, $updatedInvoiceDetailIds);
+        if (!empty($idsToDelete)) {
+            InvoiceDerail::whereIn('id', $idsToDelete)->delete();
+        }
+
         return redirect()->route('admin.add-invoice-masters.index');
     }
+
 
     public function show(AddInvoiceMaster $addInvoiceMaster)
     {

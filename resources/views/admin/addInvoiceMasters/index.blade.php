@@ -6,9 +6,9 @@
             <a class="btn btn-success" href="{{ route('admin.add-invoice-masters.create') }}">
                 {{ trans('global.add') }} {{ trans('cruds.addInvoiceMaster.title_singular') }}
             </a>
-            <a class="btn btn-success" href="{{ route('admin.add-invoice-masters.create.with.details') }}">
-                {{ trans('global.add') }} {{ trans('cruds.addInvoiceMaster.title_singular') }} With Details
-            </a>
+{{--            <a class="btn btn-success" href="{{ route('admin.add-invoice-masters.create.with.details') }}">--}}
+{{--                {{ trans('global.add') }} {{ trans('cruds.addInvoiceMaster.title_singular') }} With Details--}}
+{{--            </a>--}}
         </div>
     </div>
 @endcan

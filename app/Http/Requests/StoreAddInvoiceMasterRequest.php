@@ -6,6 +6,7 @@ use App\Models\AddInvoiceMaster;
 use Gate;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Response;
+use Illuminate\Validation\Rule;
 
 class StoreAddInvoiceMasterRequest extends FormRequest
 {
@@ -16,7 +17,18 @@ class StoreAddInvoiceMasterRequest extends FormRequest
 
     public function rules()
     {
+        $invoiceId = $this->route('add_invoice_master')->id;
         return [
+            'product_id' => 'required|array',
+            'product_id.*' => 'required|exists:products,id',
+            'rate' => 'required|array',
+            'rate.*' => 'required|numeric|min:0',
+            'quantity' => 'required|array',
+            'quantity.*' => 'required|integer|min:1',
+            'product_details' => 'nullable|array',
+            'product_details.*' => 'string|max:255',
+            'amount' => 'required|array',
+            'amount.*' => 'required|numeric|min:0',
             'select_client_id' => [
                 'required',
                 'integer',
@@ -24,7 +36,7 @@ class StoreAddInvoiceMasterRequest extends FormRequest
             'invoice_number' => [
                 'string',
                 'required',
-                'unique:add_invoice_masters',
+                Rule::unique('add_invoice_masters')->ignore($invoiceId),
             ],
             'inv_date' => [
                 'required',

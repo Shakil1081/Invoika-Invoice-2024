@@ -21,6 +21,7 @@ class InvoiceDerail extends Model
     ];
 
     protected $fillable = [
+        'invoice_id',
         'product_id',
         'rate',
         'quantity',

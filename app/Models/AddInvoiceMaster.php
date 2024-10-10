@@ -73,4 +73,9 @@ class AddInvoiceMaster extends Model
     {
         return $this->belongsTo(ShippingAddress::class, 'shipping_address_id');
     }
+
+    public function invoice_details()
+    {
+        return $this->hasMany(InvoiceDerail::class, 'invoice_id');
+    }
 }

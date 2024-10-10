@@ -10,6 +10,7 @@ class CreateInvoiceDerailsTable extends Migration
     {
         Schema::create('invoice_derails', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->integer('invoice_id');
             $table->decimal('rate', 15, 2);
             $table->string('quantity');
             $table->string('product_details')->nullable();

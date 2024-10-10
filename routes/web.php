@@ -33,8 +33,8 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
 
     // Add Invoice Master
     Route::delete('add-invoice-masters/destroy', 'AddInvoiceMasterController@massDestroy')->name('add-invoice-masters.massDestroy');
-    Route::get('add-invoice-masters/create-with-details', 'AddInvoiceMasterController@createWithDetails')->name('add-invoice-masters.create.with.details');
-    Route::post('add-invoice-masters/store-with-details', 'AddInvoiceMasterController@storeWithDetails')->name('add-invoice-masters.storeWithDetails');
+//    Route::get('add-invoice-masters/create-with-details', 'AddInvoiceMasterController@createWithDetails')->name('add-invoice-masters.create.with.details');
+//    Route::post('add-invoice-masters/store-with-details', 'AddInvoiceMasterController@storeWithDetails')->name('add-invoice-masters.storeWithDetails');
     Route::resource('add-invoice-masters', 'AddInvoiceMasterController');
 
     // Payment Status

@@ -99,10 +99,92 @@
                         <span class="help-block">{{ trans('cruds.addInvoiceMaster.fields.shipping_address_helper') }}</span>
                     </div>
                 </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    Invoice Details
+                </div>
+                <div class="card-body">
+                    @foreach($addInvoiceMaster->invoice_details as $invoiceDerail)
+                    <div id="invoice-rows">
+                        <div class="row invoice-row">
+                                <div class="col-xl-3 col-lg-2 col-md-2">
+                                    <input type="hidden" value="{{ $invoiceDerail->id }}" name="invoice_detail_ids[]">
+                                    <div class="form-group">
+                                        <label for="product_id">{{ trans('cruds.invoiceDerail.fields.product') }}</label>
+                                        <select class="form-control select2" name="product_id[]" id="product_id">
+                                            @foreach($products as $id => $entry)
+                                                <option value="{{ $id }}" {{ (old('product_id') ? old('product_id') : $invoiceDerail->product->id ?? '') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                                            @endforeach
+                                        </select>
+                                        @if($errors->has('product'))
+                                            <div class="invalid-feedback">
+                                                {{ $errors->first('product') }}
+                                            </div>
+                                        @endif
+                                        <span class="help-block">{{ trans('cruds.invoiceDerail.fields.product_helper') }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-xl-2 col-lg-2 col-md-2">
+                                    <div class="form-group">
+                                        <label class="required" for="rate">{{ trans('cruds.invoiceDerail.fields.rate') }}</label>
+                                        <input class="form-control" type="number" name="rate[]" id="rate" value="{{  $invoiceDerail->rate }}" step="0.01" required>
+
+                                        <span class="help-block">{{ trans('cruds.invoiceDerail.fields.rate_helper') }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-xl-2 col-lg-2 col-md-2">
+                                    <div class="form-group">
+                                        <label class="required" for="quantity">{{ trans('cruds.invoiceDerail.fields.quantity') }}</label>
+                                        <input class="form-control" type="number" name="quantity[]" id="quantity" value="{{ $invoiceDerail->quantity }}" required>
+                                        @if($errors->has('quantity'))
+                                            <div class="invalid-feedback">
+                                                {{ $errors->first('quantity') }}
+                                            </div>
+                                        @endif
+                                        <span class="help-block">{{ trans('cruds.invoiceDerail.fields.quantity_helper') }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-xl-2 col-lg-2 col-md-2">
+                                    <div class="form-group">
+                                        <label for="product_details">{{ trans('cruds.invoiceDerail.fields.product_details') }}</label>
+                                        <input class="form-control" type="text" name="product_details[]" id="product_details" value="{{ $invoiceDerail->product_details }}">
+                                        @if($errors->has('product_details'))
+                                            <div class="invalid-feedback">
+                                                {{ $errors->first('product_details') }}
+                                            </div>
+                                        @endif
+                                        <span class="help-block">{{ trans('cruds.invoiceDerail.fields.product_details_helper') }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-xl-2 col-lg-2 col-md-2">
+                                    <div class="form-group">
+                                        <label class="required" for="amount">{{ trans('cruds.invoiceDerail.fields.amount') }}</label>
+                                        <input class="form-control" type="number" name="amount[]" id="amount" value="{{ $invoiceDerail->amount }}" step="0.01" required readonly>
+                                        @if($errors->has('amount'))
+                                            <div class="invalid-feedback">
+                                                {{ $errors->first('amount') }}
+                                            </div>
+                                        @endif
+                                        <span class="help-block">{{ trans('cruds.invoiceDerail.fields.amount_helper') }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-xl-1 col-lg-2 col-md-2 text-right">
+                                    <button type="button" class="btn btn-sm btn-danger remove-row" style="margin-top: 31px;" disabled><i class="fa fa-minus"></i></button>
+                                    <button type="button" class="btn btn-sm btn-success add-row" style="margin-top: 31px;"><i class="fa fa-plus"></i></button>
+                                </div>
+                            </div>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+
+            <div class="row">
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="form-group">
                         <label class="required" for="sub_total">{{ trans('cruds.addInvoiceMaster.fields.sub_total') }}</label>
-                        <input class="form-control {{ $errors->has('sub_total') ? 'is-invalid' : '' }}" type="number" name="sub_total" id="sub_total" value="{{ old('sub_total', $addInvoiceMaster->sub_total) }}" step="0.01" required>
+                        <input class="form-control {{ $errors->has('sub_total') ? 'is-invalid' : '' }}" type="number" name="sub_total" id="sub_total" value="{{ old('sub_total', $addInvoiceMaster->sub_total) }}" step="0.01" required readonly>
                         @if($errors->has('sub_total'))
                             <div class="invalid-feedback">
                                 {{ $errors->first('sub_total') }}
@@ -135,7 +217,7 @@
                         <span class="help-block">{{ trans('cruds.addInvoiceMaster.fields.tax_helper') }}</span>
                     </div>
                 </div>
-                <div class="col-lg-4 col-md-6 col-sm-12">
+                <div class="col-lg-6 col-md-6 col-sm-12">
                     <div class="form-group">
                         <label for="shipping_charge">{{ trans('cruds.addInvoiceMaster.fields.shipping_charge') }}</label>
                         <input class="form-control {{ $errors->has('shipping_charge') ? 'is-invalid' : '' }}" type="number" name="shipping_charge" id="shipping_charge" value="{{ old('shipping_charge', $addInvoiceMaster->shipping_charge) }}" step="0.01">
@@ -147,10 +229,10 @@
                         <span class="help-block">{{ trans('cruds.addInvoiceMaster.fields.shipping_charge_helper') }}</span>
                     </div>
                 </div>
-                <div class="col-lg-4 col-md-6 col-sm-12">
+                <div class="col-lg-6 col-md-6 col-sm-12">
                     <div class="form-group">
                         <label class="required" for="total_amount">{{ trans('cruds.addInvoiceMaster.fields.total_amount') }}</label>
-                        <input class="form-control {{ $errors->has('total_amount') ? 'is-invalid' : '' }}" type="number" name="total_amount" id="total_amount" value="{{ old('total_amount', $addInvoiceMaster->total_amount) }}" step="0.01" required>
+                        <input class="form-control {{ $errors->has('total_amount') ? 'is-invalid' : '' }}" type="number" name="total_amount" id="total_amount" value="{{ old('total_amount', $addInvoiceMaster->total_amount) }}" step="0.01" required readonly>
                         @if($errors->has('total_amount'))
                             <div class="invalid-feedback">
                                 {{ $errors->first('total_amount') }}
@@ -159,7 +241,7 @@
                         <span class="help-block">{{ trans('cruds.addInvoiceMaster.fields.total_amount_helper') }}</span>
                     </div>
                 </div>
-                <div class="col-lg-4 col-md-6 col-sm-12">
+                <div class="col-lg-12 col-md-6 col-sm-12">
                     <div class="form-group">
                         <label for="notes">{{ trans('cruds.addInvoiceMaster.fields.notes') }}</label>
                         <textarea class="form-control {{ $errors->has('notes') ? 'is-invalid' : '' }}" name="notes" id="notes">{{ old('notes', $addInvoiceMaster->notes) }}</textarea>
@@ -182,5 +264,154 @@
 </div>
 
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        let rowCount = $('#invoice-rows .invoice-row').length || 1;
+        let selectedProducts = [];
+
+        function calculateAmount(row) {
+            const rate = parseFloat(row.find('input[name="rate[]"]').val()) || 0;
+            const quantity = parseFloat(row.find('input[name="quantity[]"]').val()) || 0;
+            const amount = rate * quantity;
+            row.find('input[name="amount[]"]').val(amount.toFixed(2));
+        }
+
+        function calculateTotals() {
+            let subtotal = 0;
+
+            $('input[name="amount[]"]').each(function() {
+                subtotal += parseFloat($(this).val()) || 0;
+            });
+
+            $('#sub_total').val(subtotal.toFixed(2));
+
+            const discount = parseFloat($('#discount').val()) || 0;
+            const tax = parseFloat($('#tax').val()) || 0;
+            const shippingCharge = parseFloat($('#shipping_charge').val()) || 0;
+
+            const totalAmount = subtotal - discount + tax + shippingCharge;
+            $('#total_amount').val(totalAmount.toFixed(2));
+        }
+
+        function toggleRemoveButtons() {
+            if (rowCount <= 1) {
+                $('.remove-row').attr('disabled', true);
+            } else {
+                $('.remove-row').attr('disabled', false);
+            }
+        }
+
+        function updateProductSelects() {
+            $('[name="product_id[]"]').each(function() {
+                const currentSelect = $(this);
+                const currentValue = currentSelect.val();
+                currentSelect.find('option').each(function() {
+                    const optionValue = $(this).val();
+                    if (selectedProducts.includes(optionValue) && optionValue !== currentValue) {
+                        $(this).prop('disabled', true);
+                    } else {
+                        $(this).prop('disabled', false);
+                    }
+                });
+            });
+        }
+
+        // Populate selectedProducts with existing rows
+        $('[name="product_id[]"]').each(function() {
+            const value = $(this).val();
+            if (value) {
+                selectedProducts.push(value);
+            }
+        });
+
+        // Call this function to disable products that are already selected
+        updateProductSelects();
+        toggleRemoveButtons();
+
+        $(document).on('click', '.add-row', function() {
+            const newRowIndex = rowCount;
+            const newRow = `
+            <div class="row invoice-row">
+                <div class="col-3">
+                    <div class="form-group">
+                        <label for="product_id">{{ trans('cruds.invoiceDerail.fields.product') }}</label>
+                        <select class="form-control select2" name="product_id[]" id="product_id_${newRowIndex}">
+                            @foreach($products as $id => $entry)
+            <option value="{{ $id }}">{{ $entry }}</option>
+                            @endforeach
+            </select>
+            <span class="help-block">{{ trans('cruds.invoiceDerail.fields.product_helper') }}</span>
+                    </div>
+                </div>
+                <div class="col-2">
+                    <div class="form-group">
+                        <label class="required" for="rate">{{ trans('cruds.invoiceDerail.fields.rate') }}</label>
+                        <input class="form-control" type="number" name="rate[]" value="" step="0.01" required>
+                    </div>
+                </div>
+                <div class="col-2">
+                    <div class="form-group">
+                        <label class="required" for="quantity">{{ trans('cruds.invoiceDerail.fields.quantity') }}</label>
+                        <input class="form-control" type="number" name="quantity[]" value="1" required>
+                    </div>
+                </div>
+                <div class="col-2">
+                    <div class="form-group">
+                        <label for="product_details">{{ trans('cruds.invoiceDerail.fields.product_details') }}</label>
+                        <input class="form-control" type="text" name="product_details[]" value="">
+                    </div>
+                </div>
+                <div class="col-2">
+                    <div class="form-group">
+                        <label class="required" for="amount">{{ trans('cruds.invoiceDerail.fields.amount') }}</label>
+                        <input class="form-control" type="number" name="amount[]" value="" step="0.01" required readonly>
+                    </div>
+                </div>
+                <div class="col-1 text-right">
+                    <button type="button" class="btn btn-sm btn-danger remove-row" style="margin-top: 31px;"><i class="fa fa-minus"></i></button>
+                    <button type="button" class="btn btn-sm btn-success add-row" style="margin-top: 31px;"><i class="fa fa-plus"></i></button>
+                </div>
+            </div>
+            `;
+            $('#invoice-rows').append(newRow);
+            rowCount++;
+            updateProductSelects();
+            toggleRemoveButtons();
+        });
+
+        $(document).on('input', 'input[name="rate[]"], input[name="quantity[]"]', function() {
+            const row = $(this).closest('.invoice-row');
+            calculateAmount(row);
+            calculateTotals();
+        });
+
+        $(document).on('click', '.remove-row', function() {
+            const row = $(this).closest('.invoice-row');
+            const productId = row.find('[name="product_id[]"]').val();
+            selectedProducts = selectedProducts.filter(id => id !== productId);
+            row.remove();
+            rowCount--;
+            calculateTotals();
+            updateProductSelects();
+            toggleRemoveButtons();
+        });
+
+        $(document).on('change', '[name="product_id[]"]', function() {
+            const productId = $(this).val();
+            const currentRowIndex = $(this).attr('id').split('_')[2];
+
+            if (!selectedProducts.includes(productId)) {
+                selectedProducts.push(productId);
+            }
+
+            updateProductSelects();
+        });
+
+        $(document).on('input', '#discount, #tax, #shipping_charge', function() {
+            calculateTotals();
+        });
+    });
+</script>
 
 @endsection
