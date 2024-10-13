@@ -14,6 +14,7 @@ use App\Models\PaymentStatus;
 use App\Models\Product;
 use App\Models\ShippingAddress;
 use Gate;
+use PDF;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -169,9 +170,18 @@ class AddInvoiceMasterController extends Controller
     {
         abort_if(Gate::denies('add_invoice_master_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $addInvoiceMaster->load('select_client', 'payment_status', 'billing_address', 'shipping_address');
+        $addInvoiceMaster->load('select_client', 'payment_status', 'billing_address', 'shipping_address','invoice_details');
 
         return view('admin.addInvoiceMasters.show', compact('addInvoiceMaster'));
+    }
+
+    public function generateInvoicePDF(AddInvoiceMaster $addInvoiceMaster)
+    {
+        $addInvoiceMaster->load('select_client', 'payment_status', 'billing_address', 'shipping_address','invoice_details');
+
+        $pdf = PDF::loadView('pdf.invoice',compact('addInvoiceMaster'));
+
+        return $pdf->download('invoice.pdf');
     }
 
     public function destroy(AddInvoiceMaster $addInvoiceMaster)

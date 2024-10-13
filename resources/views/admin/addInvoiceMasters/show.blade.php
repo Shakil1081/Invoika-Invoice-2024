@@ -12,6 +12,9 @@
                 <a class="btn btn-default" href="{{ route('admin.add-invoice-masters.index') }}">
                     {{ trans('global.back_to_list') }}
                 </a>
+                <a class="btn btn-success" href="{{ route('admin.add-invoice-masters.generate-pdf',$addInvoiceMaster->id) }}">
+                    PDF Download
+                </a>
             </div>
             <table class="table table-bordered table-striped">
                 <tbody>
