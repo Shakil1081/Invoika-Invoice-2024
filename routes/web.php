@@ -11,6 +11,10 @@ Route::get('/home', function () {
 
 Auth::routes();
 
+//test place logo in pdf
+Route::get('pdf-with-logo', 'Admin\AddInvoiceMasterController@logoPdf');
+Route::post('pdf-with-logo/upload', 'Admin\AddInvoiceMasterController@uploadLogoPdf')->name('upload-logo-pdf');
+
 Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'middleware' => ['auth']], function () {
     Route::get('/', 'HomeController@index')->name('home');
     // Permissions
@@ -35,6 +39,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::delete('add-invoice-masters/destroy', 'AddInvoiceMasterController@massDestroy')->name('add-invoice-masters.massDestroy');
 //    Route::get('add-invoice-masters/create-with-details', 'AddInvoiceMasterController@createWithDetails')->name('add-invoice-masters.create.with.details');
     Route::get('add-invoice-masters/generate-pdf/{addInvoiceMaster}', 'AddInvoiceMasterController@generateInvoicePDF')->name('add-invoice-masters.generate-pdf');
+
     Route::resource('add-invoice-masters', 'AddInvoiceMasterController');
 
     // Payment Status

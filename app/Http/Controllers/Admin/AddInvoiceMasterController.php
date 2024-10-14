@@ -14,9 +14,14 @@ use App\Models\PaymentStatus;
 use App\Models\Product;
 use App\Models\ShippingAddress;
 use Gate;
+use Illuminate\Support\Facades\Log;
+use Imagick;
 use PDF;
 use Illuminate\Http\Request;
+use setasign\Fpdi\Fpdi;
+use setasign\Fpdf\Fpdf;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\Storage;
 
 class AddInvoiceMasterController extends Controller
 {
@@ -202,5 +207,80 @@ class AddInvoiceMasterController extends Controller
         }
 
         return response(null, Response::HTTP_NO_CONTENT);
+    }
+
+    public function logoPdf()
+    {
+        return view('pdf.with_logo');
+    }
+
+    public function uploadLogoPdf(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:pdf|max:2048',
+        ]);
+
+        $pdfFilePath = $request->file('file')->store('public/uploads/pdfs');
+
+        $signaturePaths = [
+            public_path('sings/1.png'),
+            'https://w7.pngwing.com/pngs/86/846/png-transparent-signature-signature-angle-text-monochrome-thumbnail.png',
+            'https://w7.pngwing.com/pngs/755/662/png-transparent-digital-signature-handwriting-signature-block-narcissism-email-love-miscellaneous-angle-thumbnail.png',
+            'https://e7.pngegg.com/pngimages/8/721/png-clipart-signature-graphology-optima-carne-baldwinsville-text-signature-thumbnail.png',
+            'https://e7.pngegg.com/pngimages/182/169/png-clipart-type-signature-file-signature-digital-signature-signature-block-signature-angle-text-thumbnail.png',
+        ];
+
+        $watermarkedPdfPath = $this->addSignaturesToPdf(storage_path('app/' . $pdfFilePath), $signaturePaths);
+
+        return redirect()->away(Storage::url(basename($watermarkedPdfPath)));
+    }
+
+    private function addSignaturesToPdf($pdfFilePath, $signaturePaths)
+    {
+        $pdf = new Fpdi();
+        $pageCount = $pdf->setSourceFile($pdfFilePath);
+
+        for ($i = 1; $i <= $pageCount; $i++) {
+
+            $templateId = $pdf->importPage($i);
+            $pdf->AddPage();
+            $pdf->useTemplate($templateId, 0, 0, 210);
+
+            $yPosition = 270;
+            $xPosition = 20;
+            $signatureWidth = 30;
+            $signatureHeight = 20;
+            $spacing = 5;
+
+            foreach ($signaturePaths as $signature) {
+                $pdf->Image($signature, $xPosition, $yPosition, $signatureWidth, $signatureHeight);
+
+                $xPosition += $signatureWidth + $spacing;
+            }
+        }
+
+        $outputFilePath = storage_path('app/public/watermarked_' . basename($pdfFilePath));
+        $pdf->Output($outputFilePath, 'F');
+
+        return $outputFilePath;
+    }
+
+    private function createTransparentLogo($logoUrl, $opacity)
+    {
+        $image = new Imagick();
+        $image->readImage($logoUrl);
+
+        $image->setImageAlphaChannel(Imagick::ALPHACHANNEL_SET);
+        $image->evaluateImage(Imagick::EVALUATE_MULTIPLY, $opacity, Imagick::CHANNEL_ALPHA);
+
+        // Save the transparent logo
+        $transparentLogoPath = storage_path('app/public/transparent_logo.png');
+        $image->setImageFormat('png');
+        $image->writeImage($transparentLogoPath);
+
+        $image->clear();
+        $image->destroy();
+
+        return $transparentLogoPath;
     }
 }

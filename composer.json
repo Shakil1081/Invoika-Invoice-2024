@@ -14,6 +14,8 @@
         "laravel/tinker": "^2.7",
         "laraveldaily/laravel-charts": "^0.1.29",
         "nuovo/spreadsheet-reader": "^0.5.11",
+        "setasign/fpdf": "^1.8",
+        "setasign/fpdi": "^2.6",
         "spatie/laravel-medialibrary": "^10.0.7",
         "yajra/laravel-datatables-oracle": "^9.19"
     },
