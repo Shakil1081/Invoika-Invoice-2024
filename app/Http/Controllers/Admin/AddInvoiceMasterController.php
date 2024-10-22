@@ -9,10 +9,13 @@ use App\Http\Requests\UpdateAddInvoiceMasterRequest;
 use App\Models\AddInvoiceMaster;
 use App\Models\BillingAddress;
 use App\Models\CompanyList;
+use App\Models\Discount;
 use App\Models\InvoiceDerail;
 use App\Models\PaymentStatus;
 use App\Models\Product;
 use App\Models\ShippingAddress;
+use App\Models\ShippingCharge;
+use App\Models\TaxList;
 use Gate;
 use Illuminate\Support\Facades\Log;
 use Imagick;
@@ -62,8 +65,30 @@ class AddInvoiceMasterController extends Controller
         $shipping_addresses = ShippingAddress::pluck('shipping_name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         $products = Product::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $discounts = Discount::all()->map(function($discount) {
+            return [
+                'id' => $discount->id,
+                'name' => $discount->discount_name,
+                'rate' => $discount->rate,
+            ];
+        })->prepend(['id' => '', 'name' => trans('global.pleaseSelect'), 'rate' => '']);
+        $taxes = TaxList::where('status','Active')->get()->map(function($tax) {
+            return [
+                'id' => $tax->id,
+                'tax_name' => $tax->tax_name,
+                'tax_rate_in' => $tax->tax_rate_in,
+            ];
+        })->prepend(['id' => '', 'tax_name' => trans('global.pleaseSelect'), 'tax_rate_in' => '']);;
 
-        return view('admin.addInvoiceMasters.create', compact('billing_addresses', 'payment_statuses', 'select_clients', 'shipping_addresses','products'));
+        $shippingCharges = ShippingCharge::all()->map(function($shippingCharge) {
+            return [
+                'id' => $shippingCharge->id,
+                'tax_name' => $shippingCharge->tax_name,
+                'tax_rate_in' => $shippingCharge->tax_rate_in,
+            ];
+        })->prepend(['id' => '', 'tax_name' => trans('global.pleaseSelect'), 'tax_rate_in' => '']);
+
+        return view('admin.addInvoiceMasters.create', compact('billing_addresses', 'payment_statuses', 'select_clients', 'shipping_addresses','products','discounts','taxes','shippingCharges'));
     }
 
 //    public function store(StoreAddInvoiceMasterRequest $request)
@@ -209,78 +234,4 @@ class AddInvoiceMasterController extends Controller
         return response(null, Response::HTTP_NO_CONTENT);
     }
 
-    public function logoPdf()
-    {
-        return view('pdf.with_logo');
-    }
-
-    public function uploadLogoPdf(Request $request)
-    {
-        $request->validate([
-            'file' => 'required|mimes:pdf|max:2048',
-        ]);
-
-        $pdfFilePath = $request->file('file')->store('public/uploads/pdfs');
-
-        $signaturePaths = [
-            public_path('sings/1.png'),
-            'https://w7.pngwing.com/pngs/86/846/png-transparent-signature-signature-angle-text-monochrome-thumbnail.png',
-            'https://w7.pngwing.com/pngs/755/662/png-transparent-digital-signature-handwriting-signature-block-narcissism-email-love-miscellaneous-angle-thumbnail.png',
-            'https://e7.pngegg.com/pngimages/8/721/png-clipart-signature-graphology-optima-carne-baldwinsville-text-signature-thumbnail.png',
-            'https://e7.pngegg.com/pngimages/182/169/png-clipart-type-signature-file-signature-digital-signature-signature-block-signature-angle-text-thumbnail.png',
-        ];
-
-        $watermarkedPdfPath = $this->addSignaturesToPdf(storage_path('app/' . $pdfFilePath), $signaturePaths);
-
-        return redirect()->away(Storage::url(basename($watermarkedPdfPath)));
-    }
-
-    private function addSignaturesToPdf($pdfFilePath, $signaturePaths)
-    {
-        $pdf = new Fpdi();
-        $pageCount = $pdf->setSourceFile($pdfFilePath);
-
-        for ($i = 1; $i <= $pageCount; $i++) {
-
-            $templateId = $pdf->importPage($i);
-            $pdf->AddPage();
-            $pdf->useTemplate($templateId, 0, 0, 210);
-
-            $yPosition = 270;
-            $xPosition = 20;
-            $signatureWidth = 30;
-            $signatureHeight = 20;
-            $spacing = 5;
-
-            foreach ($signaturePaths as $signature) {
-                $pdf->Image($signature, $xPosition, $yPosition, $signatureWidth, $signatureHeight);
-
-                $xPosition += $signatureWidth + $spacing;
-            }
-        }
-
-        $outputFilePath = storage_path('app/public/watermarked_' . basename($pdfFilePath));
-        $pdf->Output($outputFilePath, 'F');
-
-        return $outputFilePath;
-    }
-
-    private function createTransparentLogo($logoUrl, $opacity)
-    {
-        $image = new Imagick();
-        $image->readImage($logoUrl);
-
-        $image->setImageAlphaChannel(Imagick::ALPHACHANNEL_SET);
-        $image->evaluateImage(Imagick::EVALUATE_MULTIPLY, $opacity, Imagick::CHANNEL_ALPHA);
-
-        // Save the transparent logo
-        $transparentLogoPath = storage_path('app/public/transparent_logo.png');
-        $image->setImageFormat('png');
-        $image->writeImage($transparentLogoPath);
-
-        $image->clear();
-        $image->destroy();
-
-        return $transparentLogoPath;
-    }
 }

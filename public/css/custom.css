@@ -52,6 +52,15 @@ table.dataTable thead th {
     padding-bottom: 5px !important;
 }
 
+.select2-selection{
+    min-height: 35px;
+
+}
+
+.select2-choices {
+
+}
+
 .has-error .invalid-feedback {
     display: block !important;
 }

@@ -121,7 +121,7 @@
                                 <div class="col-xl-2 col-lg-2 col-md-2">
                                     <div class="form-group">
                                         <label class="required" for="rate">{{ trans('cruds.invoiceDerail.fields.rate') }}</label>
-                                        <input class="form-control" type="number" name="rate[]" id="rate" value="{{ old('rate.0', '') }}" step="0.01" required>
+                                        <input class="form-control" type="number" name="rate[]" id="rate" value="{{ old('rate.0', '') }}" step="0.01" readonly required>
                                     </div>
                                 </div>
                                 <div class="col-xl-2 col-lg-2 col-md-2">
@@ -142,9 +142,15 @@
                                         <input class="form-control" type="number" name="amount[]" id="amount" value="{{ old('amount.0', '') }}" step="0.01" required readonly>
                                     </div>
                                 </div>
-                                <div class="col-xl-1 col-lg-2 col-md-2 text-right">
-                                    <button type="button" class="btn btn-sm btn-danger remove-row" style="margin-top: 31px;" disabled><i class="fa fa-minus"></i></button>
-                                    <button type="button" class="btn btn-sm btn-success add-row" style="margin-top: 31px;"><i class="fa fa-plus"></i></button>
+                                <div class="col-xl-1 col-lg-2 col-md-2 ">
+                                    <div class="row g-2">
+                                        <div class="col-6">
+                                            <button type="button" class="btn btn-sm btn-danger remove-row" style="margin-top: 31px;" disabled><i class="fa fa-minus"></i></button>
+                                        </div>
+                                        <div class="col-6">
+                                            <button type="button" class="btn btn-sm btn-success add-row" style="margin-top: 31px;"><i class="fa fa-plus"></i></button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -166,7 +172,14 @@
                     <div class="col-lg-4 col-md-6 col-sm-12">
                         <div class="form-group">
                             <label for="discount">{{ trans('cruds.addInvoiceMaster.fields.discount') }}</label>
-                            <input class="form-control {{ $errors->has('discount') ? 'is-invalid' : '' }}" type="number" name="discount" id="discount" value="{{ old('discount', '0') }}" step="0.01">
+                            <select class="form-control select2 {{ $errors->has('discount') ? 'is-invalid' : '' }}" name="discount" id="discount" required>
+                                @foreach($discounts as $discount)
+                                    <option value="{{ $discount['id'] }}" data-rate="{{ $discount['rate'] }}" {{ old('discount') == $discount['id'] ? 'selected' : '' }}>
+                                        {{ $discount['name'] }} ({{ $discount['rate'] }} %)
+                                    </option>
+                                @endforeach
+                            </select>
+
                             @if($errors->has('discount'))
                                 <div class="invalid-feedback">
                                     {{ $errors->first('discount') }}
@@ -178,8 +191,14 @@
                     <div class="col-lg-4 col-md-6 col-sm-12">
                         <div class="form-group">
                             <label for="tax">{{ trans('cruds.addInvoiceMaster.fields.tax') }}</label>
-                            <input class="form-control {{ $errors->has('tax') ? 'is-invalid' : '' }}" type="number" name="tax" id="tax" value="{{ old('tax', '0') }}" step="0.01">
-                            @if($errors->has('tax'))
+                            <select class="form-control select2 {{ $errors->has('tax') ? 'is-invalid' : '' }}" name="tax" id="tax" required>
+                                @foreach($taxes as $tax)
+                                    <option value="{{ $tax['id'] }}" data-rate="{{ $tax['tax_rate_in'] }}" {{ old('tax') == $tax['id'] ? 'selected' : '' }}>
+                                        {{ $tax['tax_name'] }} ({{ $tax['tax_rate_in'] }} %)
+                                    </option>
+                                @endforeach
+                            </select>
+                        @if($errors->has('tax'))
                                 <div class="invalid-feedback">
                                     {{ $errors->first('tax') }}
                                 </div>
@@ -190,7 +209,13 @@
                     <div class="col-lg-6 col-md-6 col-sm-12">
                         <div class="form-group">
                             <label for="shipping_charge">{{ trans('cruds.addInvoiceMaster.fields.shipping_charge') }}</label>
-                            <input class="form-control {{ $errors->has('shipping_charge') ? 'is-invalid' : '' }}" type="number" name="shipping_charge" id="shipping_charge" value="{{ old('shipping_charge', '') }}" step="0.01">
+                            <select class="form-control select2 {{ $errors->has('tax') ? 'is-invalid' : '' }}" name="shipping_charge" id="shipping_charge" required>
+                                @foreach($shippingCharges as $shippingCharge)
+                                    <option value="{{ $shippingCharge['id'] }}" data-rate="{{ $shippingCharge['tax_rate_in'] }}" {{ old('shipping_charge') == $shippingCharge['id'] ? 'selected' : '' }}>
+                                        {{ $shippingCharge['tax_name'] }} ({{ $shippingCharge['tax_rate_in'] }} %)
+                                    </option>
+                                @endforeach
+                            </select>
                             @if($errors->has('shipping_charge'))
                                 <div class="invalid-feedback">
                                     {{ $errors->first('shipping_charge') }}
@@ -245,23 +270,35 @@
                 const quantity = parseFloat(row.find('input[name="quantity[]"]').val()) || 0;
                 const amount = rate * quantity;
                 row.find('input[name="amount[]"]').val(amount.toFixed(2));
+                calculateTotals(); // Trigger totals after calculating the amount
             }
 
             function calculateTotals() {
                 let subtotal = 0;
 
+                // Calculate subtotal from input amounts
                 $('input[name="amount[]"]').each(function() {
                     subtotal += parseFloat($(this).val()) || 0;
                 });
 
                 $('#sub_total').val(subtotal.toFixed(2));
 
-                const discount = parseFloat($('#discount').val()) || 0;
-                const tax = parseFloat($('#tax').val()) || 0;
-                const shippingCharge = parseFloat($('#shipping_charge').val()) || 0;
+                const selectedDiscountOption = $('#discount option:selected');
+                const discountRate = parseFloat(selectedDiscountOption.data('rate')) || 0;
 
-                const totalAmount = subtotal - discount + tax + shippingCharge;
-                $('#total_amount').val(totalAmount.toFixed(2));
+                const selectedTaxOption = $('#tax option:selected');
+                const taxRate = parseFloat(selectedTaxOption.data('rate')) || 0;
+
+                const selectedShippingChargeOption = $('#shipping_charge option:selected');
+                const shippingChargeRate = parseFloat(selectedShippingChargeOption.data('rate')) || 0;
+                console.log(shippingChargeRate)
+                const discountAmount = subtotal * (discountRate / 100);
+                const totalTax = subtotal * (taxRate / 100);
+                const totalShippingCharge = subtotal * (shippingChargeRate / 100);
+
+                const totalAmount = subtotal + totalTax + totalShippingCharge - discountAmount;
+
+                $('#total_amount').val(totalAmount.toFixed(2)); // Update the total amount display
             }
 
             function toggleRemoveButtons() {
@@ -323,29 +360,34 @@
                     <input class="form-control" type="text" name="product_details[]" value="">
                 </div>
             </div>
-           <div class="col-2">
+            <div class="col-2">
                 <div class="form-group">
                     <label class="required" for="amount">{{ trans('cruds.invoiceDerail.fields.amount') }}</label>
                     <input class="form-control" type="number" name="amount[]" value="" step="0.01" required readonly>
                 </div>
             </div>
-            <div class="col-1 text-right">
-                <button type="button" class="btn btn-sm btn-danger remove-row" style="margin-top: 31px;"><i class="fa fa-minus"></i></button>
-                <button type="button" class="btn btn-sm btn-success add-row" style="margin-top: 31px;"><i class="fa fa-plus"></i></button>
+            <div class="col-xl-1 col-lg-2 col-md-2">
+                <div class="row">
+                    <div class="col-6">
+                        <button type="button" class="btn btn-sm btn-danger remove-row" style="margin-top: 31px;"><i class="fa fa-minus"></i></button>
+                    </div>
+                    <div class="col-6">
+                        <button type="button" class="btn btn-sm btn-success add-row" style="margin-top: 31px;"><i class="fa fa-plus"></i></button>
+                    </div>
+                </div>
             </div>
         </div>
         `;
                 $('#invoice-rows').append(newRow);
-                selectedProducts.push($('#product_id_0').val());
                 rowCount++;
                 updateProductSelects();
                 toggleRemoveButtons();
             });
 
+            // Trigger calculation on amount change (rate/quantity) and discount/tax changes
             $(document).on('input', 'input[name="rate[]"], input[name="quantity[]"]', function() {
                 const row = $(this).closest('.invoice-row');
                 calculateAmount(row);
-                calculateTotals();
             });
 
             $(document).on('click', '.remove-row', function() {
@@ -361,18 +403,51 @@
 
             $(document).on('change', '[name="product_id[]"]', function() {
                 const productId = $(this).val();
-                const currentRowIndex = $(this).attr('id').split('_')[2];
+                const currentRow = $(this).closest('.invoice-row');
 
+                if (productId) {
+                    const url = '{{ route("admin.product.info", ":product") }}'.replace(':product', productId);
+
+                    $.ajax({
+                        url: url,
+                        type: 'GET',
+                        success: function(response) {
+                            if (response.price) {
+                                currentRow.find('input[name="rate[]"]').val(response.price).attr('readonly', true);
+                                currentRow.find('input[name="product_details[]"]').val(response.product_details);
+
+                                calculateAmount(currentRow);
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error fetching product price:', error);
+                        }
+                    });
+                }
+
+                const currentRowIndex = $(this).attr('id').split('_')[2];
                 if (!selectedProducts.includes(productId)) {
                     selectedProducts.push(productId);
                 }
-
                 updateProductSelects();
             });
 
-            $(document).on('input', '#discount, #tax, #shipping_charge', function() {
+
+            $('#discount').on('change', function() {
+                discount = parseFloat($(this).val()) || 0;
+                calculateTotals();
+            });
+
+            $('#tax').on('change', function() {
+                tax = parseFloat($(this).val()) || 0;
+                calculateTotals();
+            });
+
+            $('#shipping_charge').on('change', function() {
+                shipping_charge = parseFloat($(this).val()) || 0;
                 calculateTotals();
             });
         });
+
     </script>
 @endsection

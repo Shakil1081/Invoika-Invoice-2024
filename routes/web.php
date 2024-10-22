@@ -11,10 +11,6 @@ Route::get('/home', function () {
 
 Auth::routes();
 
-//test place logo in pdf
-Route::get('pdf-with-logo', 'Admin\AddInvoiceMasterController@logoPdf');
-Route::post('pdf-with-logo/upload', 'Admin\AddInvoiceMasterController@uploadLogoPdf')->name('upload-logo-pdf');
-
 Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'middleware' => ['auth']], function () {
     Route::get('/', 'HomeController@index')->name('home');
     // Permissions
@@ -72,6 +68,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
 
     // Product
     Route::delete('products/destroy', 'ProductController@massDestroy')->name('products.massDestroy');
+    Route::get('/product-info/{product}', 'ProductController@getProductInfo')->name('product.info');
     Route::post('products/media', 'ProductController@storeMedia')->name('products.storeMedia');
     Route::post('products/ckmedia', 'ProductController@storeCKEditorImages')->name('products.storeCKEditorImages');
     Route::resource('products', 'ProductController');

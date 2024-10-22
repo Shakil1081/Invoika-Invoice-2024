@@ -145,4 +145,16 @@ class ProductController extends Controller
 
         return response()->json(['id' => $media->id, 'url' => $media->getUrl()], Response::HTTP_CREATED);
     }
+
+    public function getProductInfo(Product $product)
+    {
+        if ($product) {
+            return response()->json([
+                'price' => $product->price,
+                'product_details' => $product->description,
+            ]);
+        }
+
+        return response()->json(['error' => 'Product not found'], 404);
+    }
 }
