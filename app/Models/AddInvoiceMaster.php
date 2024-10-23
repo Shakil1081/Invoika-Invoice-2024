@@ -78,4 +78,9 @@ class AddInvoiceMaster extends Model
     {
         return $this->hasMany(InvoiceDerail::class, 'invoice_id');
     }
+
+    public function payments()
+    {
+        return $this->hasMany(Payment::class, 'invoice_id');
+    }
 }

@@ -13,9 +13,9 @@ class CreateAddInvoiceMastersTable extends Migration
             $table->string('invoice_number')->unique();
             $table->date('inv_date');
             $table->decimal('sub_total', 15, 2);
-            $table->decimal('discount', 15, 2)->nullable();
-            $table->decimal('tax', 15, 2)->nullable();
-            $table->decimal('shipping_charge', 15, 2)->nullable();
+            $table->unsignedInteger('discount')->nullable();
+            $table->unsignedInteger('tax')->nullable();
+            $table->unsignedInteger('shipping_charge')->nullable();
             $table->decimal('total_amount', 15, 2);
             $table->longText('notes')->nullable();
             $table->timestamps();

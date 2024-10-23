@@ -78,14 +78,20 @@
                             </a>
                         </li>
                     @endcan
-                    @can('invoice_derail_access')
+{{--                    @can('invoice_derail_access')--}}
+{{--                        <li class="c-sidebar-nav-item">--}}
+{{--                            <a href="{{ route("admin.invoice-derails.index") }}" class="c-sidebar-nav-link {{ request()->is("admin/invoice-derails") || request()->is("admin/invoice-derails/*") ? "c-active" : "" }}">--}}
+{{--                                <i class="fa-fw fas fa-file-invoice c-sidebar-nav-icon"></i>--}}
+{{--                                {{ trans('cruds.invoiceDerail.title') }}--}}
+{{--                            </a>--}}
+{{--                        </li>--}}
+{{--                    @endcan--}}
                         <li class="c-sidebar-nav-item">
-                            <a href="{{ route("admin.invoice-derails.index") }}" class="c-sidebar-nav-link {{ request()->is("admin/invoice-derails") || request()->is("admin/invoice-derails/*") ? "c-active" : "" }}">
-                                <i class="fa-fw fas fa-file-invoice c-sidebar-nav-icon"></i>
-                                {{ trans('cruds.invoiceDerail.title') }}
+                            <a href="{{ route("admin.invoice.list") }}" class="c-sidebar-nav-link {{ request()->is("admin/invoices") || request()->is("admin/invoices/*") ? "c-active" : "" }}">
+                                <i class="fa-fw fas fa-credit-card c-sidebar-nav-icon"></i>
+                                {{ trans('cruds.makePayment.title') }}
                             </a>
                         </li>
-                    @endcan
                 </ul>
             </li>
         @endcan

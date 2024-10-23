@@ -136,11 +136,11 @@
                 </td>
                 <td>
                     <strong>Bill to:</strong><br>
-                    Name: {{ $addInvoiceMaster->select_client->company_name ?? '' }}<br>
-                    Email: {{ $addInvoiceMaster->select_client->email ?? '' }}<br>
-                    Address: {{ $addInvoiceMaster->select_client->address ?? '' }}<br>
-                    Phone: {{ $addInvoiceMaster->select_client->contact_no ?? '' }}<br>
-                    Postal Code: {{ $addInvoiceMaster->select_client->postalcode ?? '' }}
+{{--                    Name: {{ $addInvoiceMaster->select_client->company_name ?? '' }}<br>--}}
+{{--                    Email: {{ $addInvoiceMaster->select_client->email ?? '' }}<br>--}}
+{{--                    Address: {{ $addInvoiceMaster->select_client->address ?? '' }}<br>--}}
+{{--                    Phone: {{ $addInvoiceMaster->select_client->contact_no ?? '' }}<br>--}}
+{{--                    Postal Code: {{ $addInvoiceMaster->select_client->postalcode ?? '' }}--}}
                 </td>
             </tr>
         </table>
@@ -151,18 +151,18 @@
     </div>
     <div class="invoice-client-info">
         <table>
-            <tr>
-                <td>
-                    <strong class="title">Invoice#: </strong>  {{ $addInvoiceMaster->invoice_number }}<br>
-                    <strong class="title">Issue Date: </strong> {{ $addInvoiceMaster->inv_date }}<br>
-                    <strong class="title">Due Date: </strong> xx.xx.xxxx<br>
-                </td>
-                <td>
-                    <strong class="title">Payment Method: </strong> ------<br>
-                    <strong class="title">Other Payment Terms: </strong> -------<br>
-                    <strong class="title">Payment Status: </strong> <span class="text-danger">{{ $addInvoiceMaster->payment_status->payment_status ?? '' }}</span><br>
-                </td>
-            </tr>
+{{--            <tr>--}}
+{{--                <td>--}}
+{{--                    <strong class="title">Invoice#: </strong>  {{ $addInvoiceMaster->invoice_number }}<br>--}}
+{{--                    <strong class="title">Issue Date: </strong> {{ $addInvoiceMaster->inv_date }}<br>--}}
+{{--                    <strong class="title">Due Date: </strong> xx.xx.xxxx<br>--}}
+{{--                </td>--}}
+{{--                <td>--}}
+{{--                    <strong class="title">Payment Method: </strong> ------<br>--}}
+{{--                    <strong class="title">Other Payment Terms: </strong> -------<br>--}}
+{{--                    <strong class="title">Payment Status: </strong> <span class="text-danger">{{ $addInvoiceMaster->payment_status->payment_status ?? '' }}</span><br>--}}
+{{--                </td>--}}
+{{--            </tr>--}}
         </table>
     </div>
 
@@ -170,56 +170,56 @@
         <p class="title"> Invoice Items</p>
     </div>
     <table>
-        <tr>
-            <th class="title">No.</th>
-            <th class="title" width="40%">Item Description</th>
-            <th class="title">Rate</th>
-            <th class="title">QTY</th>
-            <th class="title">Amount In</th>
-        </tr>
-        {{ $sl=1 }}
-        @foreach($addInvoiceMaster->invoice_details as $invoiceDerail)
-            <tr>
-                <td>{{ $sl++ }}</td>
-                <td>{{ $invoiceDerail->product_details }}</td>
-                <td>{{ $invoiceDerail->rate }}</td>
-                <td>{{ $invoiceDerail->quantity }}</td>
-                <td>{{ $invoiceDerail->amount }}</td>
-            </tr>
-        @endforeach
+{{--        <tr>--}}
+{{--            <th class="title">No.</th>--}}
+{{--            <th class="title" width="40%">Item Description</th>--}}
+{{--            <th class="title">Rate</th>--}}
+{{--            <th class="title">QTY</th>--}}
+{{--            <th class="title">Amount In</th>--}}
+{{--        </tr>--}}
+{{--        {{ $sl=1 }}--}}
+{{--        @foreach($addInvoiceMaster->invoice_details as $invoiceDerail)--}}
+{{--            <tr>--}}
+{{--                <td>{{ $sl++ }}</td>--}}
+{{--                <td>{{ $invoiceDerail->product_details }}</td>--}}
+{{--                <td>{{ $invoiceDerail->rate }}</td>--}}
+{{--                <td>{{ $invoiceDerail->quantity }}</td>--}}
+{{--                <td>{{ $invoiceDerail->amount }}</td>--}}
+{{--            </tr>--}}
+{{--        @endforeach--}}
     </table>
 
     <div class="invoice-footer">
         <table>
-            <tr>
-                <td class="notes">
-                    <p class="title">Notes:</p>
-                    Lorem ipsum dolor sit, amet consectetur adipisicing elit. Nobis minus deleniti, inventore facilis sequi,
-                </td>
-                <td class="amount-area">
-                    <div class="amount-break">
-                        <div class="amount-name">
-                            Subtotal
-                            <h2 class="title"> {{ $addInvoiceMaster->sub_total }}</h2>
-                        </div>
-                        <div class="amount-name">
-                            Discount
-                            <h2 class="title">{{ $addInvoiceMaster->discount }}</h2>
-                        </div>
-                        <div class="amount-name">
-                            Taxes
-                            <h2 class="title">{{ $addInvoiceMaster->tax }}</h2>
-                        </div>
-                        <div class="amount-name">
-                            Shipping Charge
-                            <h2 class="title">{{ $addInvoiceMaster->shipping_charge }}</h2>
-                        </div>
-                    </div>
-                    <div class="amount-total">
-                        Invoice Total <h2 class="title">{{ $addInvoiceMaster->total_amount }}</h2>
-                    </div>
-                </td>
-            </tr>
+{{--            <tr>--}}
+{{--                <td class="notes">--}}
+{{--                    <p class="title">Notes:</p>--}}
+{{--                    Lorem ipsum dolor sit, amet consectetur adipisicing elit. Nobis minus deleniti, inventore facilis sequi,--}}
+{{--                </td>--}}
+{{--                <td class="amount-area">--}}
+{{--                    <div class="amount-break">--}}
+{{--                        <div class="amount-name">--}}
+{{--                            Subtotal--}}
+{{--                            <h2 class="title"> {{ $addInvoiceMaster->sub_total }}</h2>--}}
+{{--                        </div>--}}
+{{--                        <div class="amount-name">--}}
+{{--                            Discount--}}
+{{--                            <h2 class="title">{{ $addInvoiceMaster->discount }}</h2>--}}
+{{--                        </div>--}}
+{{--                        <div class="amount-name">--}}
+{{--                            Taxes--}}
+{{--                            <h2 class="title">{{ $addInvoiceMaster->tax }}</h2>--}}
+{{--                        </div>--}}
+{{--                        <div class="amount-name">--}}
+{{--                            Shipping Charge--}}
+{{--                            <h2 class="title">{{ $addInvoiceMaster->shipping_charge }}</h2>--}}
+{{--                        </div>--}}
+{{--                    </div>--}}
+{{--                    <div class="amount-total">--}}
+{{--                        Invoice Total <h2 class="title">{{ $addInvoiceMaster->total_amount }}</h2>--}}
+{{--                    </div>--}}
+{{--                </td>--}}
+{{--            </tr>--}}
         </table>
     </div>
 </div>

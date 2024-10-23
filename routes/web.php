@@ -107,6 +107,13 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::post('shipping-charges/parse-csv-import', 'ShippingChargeController@parseCsvImport')->name('shipping-charges.parseCsvImport');
     Route::post('shipping-charges/process-csv-import', 'ShippingChargeController@processCsvImport')->name('shipping-charges.processCsvImport');
     Route::resource('shipping-charges', 'ShippingChargeController');
+
+    Route::get('/invoices', 'PaymentController@showInvoiceList')->name('invoice.list');
+    Route::get('/invoices/{invoice}/payment', 'PaymentController@showPaymentPage')->name('invoice.payment');
+    Route::post('/invoices/{invoice}/payment', 'PaymentController@processPayment')->name('invoice.processPayment');
+
+    Route::get('invoices/payment-make/{invoice}', 'PaymentController@paymentMakePage')->name('payment.confirmation');
+    Route::post('/invoices/{amount}/{invoice}/finalize', 'PaymentController@finalizePayment')->name('invoice.finalizePayment');
 });
 Route::group(['prefix' => 'profile', 'as' => 'profile.', 'namespace' => 'Auth', 'middleware' => ['auth']], function () {
     // Change password

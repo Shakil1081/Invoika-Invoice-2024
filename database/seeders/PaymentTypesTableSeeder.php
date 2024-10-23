@@ -17,20 +17,20 @@ class PaymentTypesTableSeeder extends Seeder
     {
         $data = [
             [
-                'name' => 'Credit Card',
+                'name' => 'Card',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
-            [
-                'name' => 'Debit Card',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'name' => 'PayPal',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
+//            [
+//                'name' => 'Card',
+//                'created_at' => now(),
+//                'updated_at' => now(),
+//            ],
+//            [
+//                'name' => 'PayPal',
+//                'created_at' => now(),
+//                'updated_at' => now(),
+//            ],
             [
                 'name' => 'Bank Transfer',
                 'created_at' => now(),
