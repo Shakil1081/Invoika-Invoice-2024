@@ -142,9 +142,33 @@ class AddInvoiceMasterController extends Controller
 
         $products = Product::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
+        $discounts = Discount::all()->map(function($discount) {
+            return [
+                'id' => $discount->id,
+                'name' => $discount->discount_name,
+                'rate' => $discount->rate,
+            ];
+        })->prepend(['id' => '', 'name' => trans('global.pleaseSelect'), 'rate' => '']);
+        $taxes = TaxList::where('status','Active')->get()->map(function($tax) {
+            return [
+                'id' => $tax->id,
+                'tax_name' => $tax->tax_name,
+                'tax_rate_in' => $tax->tax_rate_in,
+            ];
+        })->prepend(['id' => '', 'tax_name' => trans('global.pleaseSelect'), 'tax_rate_in' => '']);;
+
+        $shippingCharges = ShippingCharge::all()->map(function($shippingCharge) {
+            return [
+                'id' => $shippingCharge->id,
+                'tax_name' => $shippingCharge->tax_name,
+                'tax_rate_in' => $shippingCharge->tax_rate_in,
+            ];
+        })->prepend(['id' => '', 'tax_name' => trans('global.pleaseSelect'), 'tax_rate_in' => '']);
+
+
         $addInvoiceMaster->load('select_client', 'payment_status', 'billing_address', 'shipping_address','invoice_details');
 
-        return view('admin.addInvoiceMasters.edit', compact('addInvoiceMaster', 'billing_addresses', 'payment_statuses', 'select_clients', 'shipping_addresses','products'));
+        return view('admin.addInvoiceMasters.edit', compact('addInvoiceMaster', 'billing_addresses', 'payment_statuses', 'select_clients', 'shipping_addresses','products','discounts','taxes','shippingCharges'));
     }
 
     public function update(StoreAddInvoiceMasterRequest $request, AddInvoiceMaster $addInvoiceMaster)

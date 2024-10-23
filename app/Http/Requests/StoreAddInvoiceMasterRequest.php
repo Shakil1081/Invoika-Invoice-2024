@@ -17,7 +17,7 @@ class StoreAddInvoiceMasterRequest extends FormRequest
 
     public function rules()
     {
-        $invoiceId = $this->route('add_invoice_master')->id;
+        $invoiceId = $this->route('add_invoice_master')->id ?? '';
         return [
             'product_id' => 'required|array',
             'product_id.*' => 'required|exists:products,id',

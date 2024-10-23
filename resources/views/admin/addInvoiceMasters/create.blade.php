@@ -270,13 +270,12 @@
                 const quantity = parseFloat(row.find('input[name="quantity[]"]').val()) || 0;
                 const amount = rate * quantity;
                 row.find('input[name="amount[]"]').val(amount.toFixed(2));
-                calculateTotals(); // Trigger totals after calculating the amount
+                calculateTotals();
             }
 
             function calculateTotals() {
                 let subtotal = 0;
 
-                // Calculate subtotal from input amounts
                 $('input[name="amount[]"]').each(function() {
                     subtotal += parseFloat($(this).val()) || 0;
                 });
@@ -291,14 +290,14 @@
 
                 const selectedShippingChargeOption = $('#shipping_charge option:selected');
                 const shippingChargeRate = parseFloat(selectedShippingChargeOption.data('rate')) || 0;
-                console.log(shippingChargeRate)
+
                 const discountAmount = subtotal * (discountRate / 100);
                 const totalTax = subtotal * (taxRate / 100);
                 const totalShippingCharge = subtotal * (shippingChargeRate / 100);
 
                 const totalAmount = subtotal + totalTax + totalShippingCharge - discountAmount;
 
-                $('#total_amount').val(totalAmount.toFixed(2)); // Update the total amount display
+                $('#total_amount').val(totalAmount.toFixed(2));
             }
 
             function toggleRemoveButtons() {

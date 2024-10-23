@@ -129,7 +129,7 @@
                                 <div class="col-xl-2 col-lg-2 col-md-2">
                                     <div class="form-group">
                                         <label class="required" for="rate">{{ trans('cruds.invoiceDerail.fields.rate') }}</label>
-                                        <input class="form-control" type="number" name="rate[]" id="rate" value="{{  $invoiceDerail->rate }}" step="0.01" required>
+                                        <input class="form-control" type="number" name="rate[]" id="rate" value="{{  $invoiceDerail->rate }}" step="0.01" readonly required>
 
                                         <span class="help-block">{{ trans('cruds.invoiceDerail.fields.rate_helper') }}</span>
                                     </div>
@@ -196,7 +196,14 @@
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="form-group">
                         <label for="discount">{{ trans('cruds.addInvoiceMaster.fields.discount') }}</label>
-                        <input class="form-control {{ $errors->has('discount') ? 'is-invalid' : '' }}" type="number" name="discount" id="discount" value="{{ old('discount', $addInvoiceMaster->discount) }}" step="0.01">
+                        <select class="form-control select2 {{ $errors->has('discount') ? 'is-invalid' : '' }}" name="discount" id="discount" required>
+                            @foreach($discounts as $discount)
+                                <option value="{{ $discount['id'] }}" data-rate="{{ $discount['rate'] }}" {{ $addInvoiceMaster->discount == $discount['id'] ? 'selected' : '' }}>
+                                    {{ $discount['name'] }} ({{ $discount['rate'] }} %)
+                                </option>
+                            @endforeach
+                        </select>
+
                         @if($errors->has('discount'))
                             <div class="invalid-feedback">
                                 {{ $errors->first('discount') }}
@@ -208,7 +215,13 @@
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="form-group">
                         <label for="tax">{{ trans('cruds.addInvoiceMaster.fields.tax') }}</label>
-                        <input class="form-control {{ $errors->has('tax') ? 'is-invalid' : '' }}" type="number" name="tax" id="tax" value="{{ old('tax', $addInvoiceMaster->tax) }}" step="0.01">
+                        <select class="form-control select2 {{ $errors->has('tax') ? 'is-invalid' : '' }}" name="tax" id="tax" required>
+                            @foreach($taxes as $tax)
+                                <option value="{{ $tax['id'] }}" data-rate="{{ $tax['tax_rate_in'] }}" {{ $addInvoiceMaster->tax == $tax['id'] ? 'selected' : '' }}>
+                                    {{ $tax['tax_name'] }} ({{ $tax['tax_rate_in'] }} %)
+                                </option>
+                            @endforeach
+                        </select>
                         @if($errors->has('tax'))
                             <div class="invalid-feedback">
                                 {{ $errors->first('tax') }}
@@ -220,7 +233,13 @@
                 <div class="col-lg-6 col-md-6 col-sm-12">
                     <div class="form-group">
                         <label for="shipping_charge">{{ trans('cruds.addInvoiceMaster.fields.shipping_charge') }}</label>
-                        <input class="form-control {{ $errors->has('shipping_charge') ? 'is-invalid' : '' }}" type="number" name="shipping_charge" id="shipping_charge" value="{{ old('shipping_charge', $addInvoiceMaster->shipping_charge) }}" step="0.01">
+                        <select class="form-control select2 {{ $errors->has('tax') ? 'is-invalid' : '' }}" name="shipping_charge" id="shipping_charge" required>
+                            @foreach($shippingCharges as $shippingCharge)
+                                <option value="{{ $shippingCharge['id'] }}" data-rate="{{ $shippingCharge['tax_rate_in'] }}" {{ $addInvoiceMaster->shipping_charge == $shippingCharge['id'] ? 'selected' : '' }}>
+                                    {{ $shippingCharge['tax_name'] }} ({{ $shippingCharge['tax_rate_in'] }} %)
+                                </option>
+                            @endforeach
+                        </select>
                         @if($errors->has('shipping_charge'))
                             <div class="invalid-feedback">
                                 {{ $errors->first('shipping_charge') }}
@@ -275,6 +294,7 @@
             const quantity = parseFloat(row.find('input[name="quantity[]"]').val()) || 0;
             const amount = rate * quantity;
             row.find('input[name="amount[]"]').val(amount.toFixed(2));
+            calculateTotals();
         }
 
         function calculateTotals() {
@@ -286,11 +306,21 @@
 
             $('#sub_total').val(subtotal.toFixed(2));
 
-            const discount = parseFloat($('#discount').val()) || 0;
-            const tax = parseFloat($('#tax').val()) || 0;
-            const shippingCharge = parseFloat($('#shipping_charge').val()) || 0;
+            const selectedDiscountOption = $('#discount option:selected');
+            const discountRate = parseFloat(selectedDiscountOption.data('rate')) || 0;
 
-            const totalAmount = subtotal - discount + tax + shippingCharge;
+            const selectedTaxOption = $('#tax option:selected');
+            const taxRate = parseFloat(selectedTaxOption.data('rate')) || 0;
+
+            const selectedShippingChargeOption = $('#shipping_charge option:selected');
+            const shippingChargeRate = parseFloat(selectedShippingChargeOption.data('rate')) || 0;
+
+            const discountAmount = subtotal * (discountRate / 100);
+            const totalTax = subtotal * (taxRate / 100);
+            const totalShippingCharge = subtotal * (shippingChargeRate / 100);
+
+            const totalAmount = subtotal + totalTax + totalShippingCharge - discountAmount;
+
             $('#total_amount').val(totalAmount.toFixed(2));
         }
 
@@ -399,16 +429,47 @@
 
         $(document).on('change', '[name="product_id[]"]', function() {
             const productId = $(this).val();
-            const currentRowIndex = $(this).attr('id').split('_')[2];
+            const currentRow = $(this).closest('.invoice-row');
 
+            if (productId) {
+                const url = '{{ route("admin.product.info", ":product") }}'.replace(':product', productId);
+
+                $.ajax({
+                    url: url,
+                    type: 'GET',
+                    success: function(response) {
+                        if (response.price) {
+                            currentRow.find('input[name="rate[]"]').val(response.price).attr('readonly', true);
+                            currentRow.find('input[name="product_details[]"]').val(response.product_details);
+
+                            calculateAmount(currentRow);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error fetching product price:', error);
+                    }
+                });
+            }
+
+            const currentRowIndex = $(this).attr('id').split('_')[2];
             if (!selectedProducts.includes(productId)) {
                 selectedProducts.push(productId);
             }
-
             updateProductSelects();
         });
 
-        $(document).on('input', '#discount, #tax, #shipping_charge', function() {
+        $('#discount').on('change', function() {
+            discount = parseFloat($(this).val()) || 0;
+            calculateTotals();
+        });
+
+        $('#tax').on('change', function() {
+            tax = parseFloat($(this).val()) || 0;
+            calculateTotals();
+        });
+
+        $('#shipping_charge').on('change', function() {
+            shipping_charge = parseFloat($(this).val()) || 0;
             calculateTotals();
         });
     });
