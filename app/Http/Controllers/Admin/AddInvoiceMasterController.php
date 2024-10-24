@@ -18,11 +18,8 @@ use App\Models\ShippingCharge;
 use App\Models\TaxList;
 use Gate;
 use Illuminate\Support\Facades\Log;
-use Imagick;
 use PDF;
 use Illuminate\Http\Request;
-use setasign\Fpdi\Fpdi;
-use setasign\Fpdf\Fpdf;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Storage;
 
@@ -32,7 +29,7 @@ class AddInvoiceMasterController extends Controller
     {
         abort_if(Gate::denies('add_invoice_master_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $addInvoiceMasters = AddInvoiceMaster::with(['select_client', 'payment_status', 'billing_address', 'shipping_address'])->get();
+        $addInvoiceMasters = AddInvoiceMaster::with(['select_client', 'payment_status', 'billing_address', 'shipping_address','discounts','taxes','shippingCharge'])->get();
 
         return view('admin.addInvoiceMasters.index', compact('addInvoiceMasters'));
     }
@@ -231,7 +228,7 @@ class AddInvoiceMasterController extends Controller
 
     public function generateInvoicePDF(AddInvoiceMaster $addInvoiceMaster)
     {
-        $addInvoiceMaster->load('select_client', 'payment_status', 'billing_address', 'shipping_address','invoice_details');
+        $addInvoiceMaster->load('select_client', 'payment_status', 'billing_address', 'shipping_address','invoice_details','discounts','taxes','shippingCharge');
 
         $pdf = PDF::loadView('pdf.invoice',compact('addInvoiceMaster'));
 

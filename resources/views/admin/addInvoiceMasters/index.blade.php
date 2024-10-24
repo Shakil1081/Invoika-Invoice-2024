@@ -100,13 +100,13 @@
                                 {{ $addInvoiceMaster->sub_total ?? '' }}
                             </td>
                             <td>
-                                {{ $addInvoiceMaster->discount ?? '' }}
+                                {{ $addInvoiceMaster->discounts->discount_name.'('.$addInvoiceMaster->discounts->rate.' %)' ?? '' }}
                             </td>
                             <td>
-                                {{ $addInvoiceMaster->tax ?? '' }}
+                                {{ $addInvoiceMaster->taxes->tax_name.'('.$addInvoiceMaster->taxes->tax_rate_in.' %)' ?? '' }}
                             </td>
                             <td>
-                                {{ $addInvoiceMaster->shipping_charge ?? '' }}
+                                {{ $addInvoiceMaster->shippingCharge->tax_name.'('.$addInvoiceMaster->shippingCharge->tax_rate_in.' %)' ?? '' }}
                             </td>
                             <td>
                                 {{ $addInvoiceMaster->total_amount ?? '' }}
@@ -134,6 +134,10 @@
                                         <input type="submit" class="btn btn-xs btn-danger" value="{{ trans('global.delete') }}">
                                     </form>
                                 @endcan
+
+                                    <a class="btn btn-xs btn-warning text-white" href="{{ route('admin.add-invoice-masters.generate-pdf', $addInvoiceMaster->id) }}">
+                                        {{ trans('global.downloadFile') }}
+                                    </a>
 
                             </td>
 

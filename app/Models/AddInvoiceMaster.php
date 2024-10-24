@@ -83,4 +83,19 @@ class AddInvoiceMaster extends Model
     {
         return $this->hasMany(Payment::class, 'invoice_id');
     }
+
+    public function discounts()
+    {
+        return $this->belongsTo(Discount::class, 'discount');
+    }
+
+    public function taxes()
+    {
+        return $this->belongsTo(TaxList::class, 'tax');
+    }
+
+    public function shippingCharge()
+    {
+        return $this->belongsTo(ShippingCharge::class, 'shipping_charge');
+    }
 }
