@@ -7,6 +7,7 @@ use App\Http\Controllers\Traits\CsvImportTrait;
 use App\Http\Requests\MassDestroyShippingAddressRequest;
 use App\Http\Requests\StoreShippingAddressRequest;
 use App\Http\Requests\UpdateShippingAddressRequest;
+use App\Models\CompanyList;
 use App\Models\ShippingAddress;
 use Gate;
 use Illuminate\Http\Request;
@@ -22,7 +23,7 @@ class ShippingAddressController extends Controller
         abort_if(Gate::denies('shipping_address_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         if ($request->ajax()) {
-            $query = ShippingAddress::query()->select(sprintf('%s.*', (new ShippingAddress)->table));
+            $query = ShippingAddress::with('company')->select(sprintf('%s.*', (new ShippingAddress)->table));
             $table = Datatables::of($query);
 
             $table->addColumn('placeholder', '&nbsp;');
@@ -43,6 +44,9 @@ class ShippingAddressController extends Controller
                 ));
             });
 
+            $table->addColumn('company_name', function ($row) {
+                return $row->company ? $row->company->company_name : '';
+            });
             $table->editColumn('shipping_name', function ($row) {
                 return $row->shipping_name ? $row->shipping_name : '';
             });
@@ -67,8 +71,8 @@ class ShippingAddressController extends Controller
     public function create()
     {
         abort_if(Gate::denies('shipping_address_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-
-        return view('admin.shippingAddresses.create');
+        $companies = CompanyList::pluck('company_name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        return view('admin.shippingAddresses.create',compact('companies'));
     }
 
     public function store(StoreShippingAddressRequest $request)
@@ -81,8 +85,8 @@ class ShippingAddressController extends Controller
     public function edit(ShippingAddress $shippingAddress)
     {
         abort_if(Gate::denies('shipping_address_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-
-        return view('admin.shippingAddresses.edit', compact('shippingAddress'));
+        $companies = CompanyList::pluck('company_name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        return view('admin.shippingAddresses.edit', compact('shippingAddress','companies'));
     }
 
     public function update(UpdateShippingAddressRequest $request, ShippingAddress $shippingAddress)

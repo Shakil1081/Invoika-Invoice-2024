@@ -17,6 +17,7 @@ class ShippingAddressesTableSeeder extends Seeder
     {
         $data = [
             [
+                'company_id' => 1,
                 'shipping_name' => 'John Doe',
                 'shippling_address' => '123 Main St, Springfield, IL, 62701',
                 'shippling_mobile_number' => '1234567890',
@@ -25,6 +26,7 @@ class ShippingAddressesTableSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
+                'company_id' => 1,
                 'shipping_name' => 'Jane Smith',
                 'shippling_address' => '456 Oak St, Chicago, IL, 60616',
                 'shippling_mobile_number' => '9876543210',
@@ -33,10 +35,11 @@ class ShippingAddressesTableSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
+                'company_id' => 2,
                 'shipping_name' => 'Michael Johnson',
                 'shippling_address' => '789 Pine St, Los Angeles, CA, 90001',
                 'shippling_mobile_number' => '5551234567',
-                'shippling_tax_number' => null,  // Optional field, can be null
+                'shippling_tax_number' => 'TAX654331',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],

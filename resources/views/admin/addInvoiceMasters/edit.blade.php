@@ -16,7 +16,9 @@
                         <label class="required" for="select_client_id">{{ trans('cruds.addInvoiceMaster.fields.select_client') }}</label>
                         <select class="form-control select2 {{ $errors->has('select_client') ? 'is-invalid' : '' }}" name="select_client_id" id="select_client_id" required>
                             @foreach($select_clients as $id => $entry)
-                                <option value="{{ $id }}" {{ (old('select_client_id') ? old('select_client_id') : $addInvoiceMaster->select_client->id ?? '') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                                <option value="{{ $id }}" {{ (old('select_client_id') ? old('select_client_id') : $addInvoiceMaster->select_client->id ?? '') == $id ? 'selected' : '' }}>
+                                    {{ $entry }}
+                                </option>
                             @endforeach
                         </select>
                         @if($errors->has('select_client'))
@@ -30,7 +32,7 @@
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="form-group">
                         <label class="required" for="invoice_number">{{ trans('cruds.addInvoiceMaster.fields.invoice_number') }}</label>
-                        <input class="form-control {{ $errors->has('invoice_number') ? 'is-invalid' : '' }}" type="text" name="invoice_number" id="invoice_number" value="{{ old('invoice_number', $addInvoiceMaster->invoice_number) }}" required>
+                        <input class="form-control {{ $errors->has('invoice_number') ? 'is-invalid' : '' }}" type="text" name="invoice_number" id="invoice_number" value="{{ old('invoice_number', $addInvoiceMaster->invoice_number) }}" required readonly>
                         @if($errors->has('invoice_number'))
                             <div class="invalid-feedback">
                                 {{ $errors->first('invoice_number') }}
@@ -71,9 +73,7 @@
                     <div class="form-group">
                         <label for="billing_address_id">{{ trans('cruds.addInvoiceMaster.fields.billing_address') }}</label>
                         <select class="form-control select2 {{ $errors->has('billing_address') ? 'is-invalid' : '' }}" name="billing_address_id" id="billing_address_id">
-                            @foreach($billing_addresses as $id => $entry)
-                                <option value="{{ $id }}" {{ (old('billing_address_id') ? old('billing_address_id') : $addInvoiceMaster->billing_address->id ?? '') == $id ? 'selected' : '' }}>{{ $entry }}</option>
-                            @endforeach
+                            <!-- This will be dynamically filled -->
                         </select>
                         @if($errors->has('billing_address'))
                             <div class="invalid-feedback">
@@ -83,13 +83,12 @@
                         <span class="help-block">{{ trans('cruds.addInvoiceMaster.fields.billing_address_helper') }}</span>
                     </div>
                 </div>
+
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="form-group">
                         <label class="required" for="shipping_address_id">{{ trans('cruds.addInvoiceMaster.fields.shipping_address') }}</label>
                         <select class="form-control select2 {{ $errors->has('shipping_address') ? 'is-invalid' : '' }}" name="shipping_address_id" id="shipping_address_id" required>
-                            @foreach($shipping_addresses as $id => $entry)
-                                <option value="{{ $id }}" {{ (old('shipping_address_id') ? old('shipping_address_id') : $addInvoiceMaster->shipping_address->id ?? '') == $id ? 'selected' : '' }}>{{ $entry }}</option>
-                            @endforeach
+                            <!-- This will be dynamically filled -->
                         </select>
                         @if($errors->has('shipping_address'))
                             <div class="invalid-feedback">
@@ -283,95 +282,98 @@
 </div>
 
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-    $(document).ready(function() {
-        let rowCount = $('#invoice-rows .invoice-row').length || 1;
-        let selectedProducts = [];
 
-        function calculateAmount(row) {
-            const rate = parseFloat(row.find('input[name="rate[]"]').val()) || 0;
-            const quantity = parseFloat(row.find('input[name="quantity[]"]').val()) || 0;
-            const amount = rate * quantity;
-            row.find('input[name="amount[]"]').val(amount.toFixed(2));
-            calculateTotals();
-        }
+@endsection
 
-        function calculateTotals() {
-            let subtotal = 0;
+@section('scripts')
+    <script>
+        $(document).ready(function() {
+            let rowCount = $('#invoice-rows .invoice-row').length || 1;
+            let selectedProducts = [];
 
-            $('input[name="amount[]"]').each(function() {
-                subtotal += parseFloat($(this).val()) || 0;
-            });
-
-            $('#sub_total').val(subtotal.toFixed(2));
-
-            const selectedDiscountOption = $('#discount option:selected');
-            const discountRate = parseFloat(selectedDiscountOption.data('rate')) || 0;
-
-            const selectedTaxOption = $('#tax option:selected');
-            const taxRate = parseFloat(selectedTaxOption.data('rate')) || 0;
-
-            const selectedShippingChargeOption = $('#shipping_charge option:selected');
-            const shippingChargeRate = parseFloat(selectedShippingChargeOption.data('rate')) || 0;
-
-            const discountAmount = subtotal * (discountRate / 100);
-            const totalTax = subtotal * (taxRate / 100);
-            const totalShippingCharge = subtotal * (shippingChargeRate / 100);
-
-            const totalAmount = subtotal + totalTax + totalShippingCharge - discountAmount;
-
-            $('#total_amount').val(totalAmount.toFixed(2));
-        }
-
-        function toggleRemoveButtons() {
-            if (rowCount <= 1) {
-                $('.remove-row').attr('disabled', true);
-            } else {
-                $('.remove-row').attr('disabled', false);
+            function calculateAmount(row) {
+                const rate = parseFloat(row.find('input[name="rate[]"]').val()) || 0;
+                const quantity = parseFloat(row.find('input[name="quantity[]"]').val()) || 0;
+                const amount = rate * quantity;
+                row.find('input[name="amount[]"]').val(amount.toFixed(2));
+                calculateTotals();
             }
-        }
 
-        function updateProductSelects() {
-            $('[name="product_id[]"]').each(function() {
-                const currentSelect = $(this);
-                const currentValue = currentSelect.val();
-                currentSelect.find('option').each(function() {
-                    const optionValue = $(this).val();
-                    if (selectedProducts.includes(optionValue) && optionValue !== currentValue) {
-                        $(this).prop('disabled', true);
-                    } else {
-                        $(this).prop('disabled', false);
-                    }
+            function calculateTotals() {
+                let subtotal = 0;
+
+                $('input[name="amount[]"]').each(function() {
+                    subtotal += parseFloat($(this).val()) || 0;
                 });
-            });
-        }
 
-        // Populate selectedProducts with existing rows
-        $('[name="product_id[]"]').each(function() {
-            const value = $(this).val();
-            if (value) {
-                selectedProducts.push(value);
+                $('#sub_total').val(subtotal.toFixed(2));
+
+                const selectedDiscountOption = $('#discount option:selected');
+                const discountRate = parseFloat(selectedDiscountOption.data('rate')) || 0;
+
+                const selectedTaxOption = $('#tax option:selected');
+                const taxRate = parseFloat(selectedTaxOption.data('rate')) || 0;
+
+                const selectedShippingChargeOption = $('#shipping_charge option:selected');
+                const shippingChargeRate = parseFloat(selectedShippingChargeOption.data('rate')) || 0;
+
+                const discountAmount = subtotal * (discountRate / 100);
+                const totalTax = subtotal * (taxRate / 100);
+                const totalShippingCharge = subtotal * (shippingChargeRate / 100);
+
+                const totalAmount = subtotal + totalTax + totalShippingCharge - discountAmount;
+
+                $('#total_amount').val(totalAmount.toFixed(2));
             }
-        });
 
-        // Call this function to disable products that are already selected
-        updateProductSelects();
-        toggleRemoveButtons();
+            function toggleRemoveButtons() {
+                if (rowCount <= 1) {
+                    $('.remove-row').attr('disabled', true);
+                } else {
+                    $('.remove-row').attr('disabled', false);
+                }
+            }
 
-        $(document).on('click', '.add-row', function() {
-            const newRowIndex = rowCount;
-            const newRow = `
+            function updateProductSelects() {
+                $('[name="product_id[]"]').each(function() {
+                    const currentSelect = $(this);
+                    const currentValue = currentSelect.val();
+                    currentSelect.find('option').each(function() {
+                        const optionValue = $(this).val();
+                        if (selectedProducts.includes(optionValue) && optionValue !== currentValue) {
+                            $(this).prop('disabled', true);
+                        } else {
+                            $(this).prop('disabled', false);
+                        }
+                    });
+                });
+            }
+
+            // Populate selectedProducts with existing rows
+            $('[name="product_id[]"]').each(function() {
+                const value = $(this).val();
+                if (value) {
+                    selectedProducts.push(value);
+                }
+            });
+
+            // Call this function to disable products that are already selected
+            updateProductSelects();
+            toggleRemoveButtons();
+
+            $(document).on('click', '.add-row', function() {
+                const newRowIndex = rowCount;
+                const newRow = `
             <div class="row invoice-row">
                 <div class="col-3">
                     <div class="form-group">
                         <label for="product_id">{{ trans('cruds.invoiceDerail.fields.product') }}</label>
                         <select class="form-control select2" name="product_id[]" id="product_id_${newRowIndex}">
                             @foreach($products as $id => $entry)
-            <option value="{{ $id }}">{{ $entry }}</option>
+                <option value="{{ $id }}">{{ $entry }}</option>
                             @endforeach
-            </select>
-            <span class="help-block">{{ trans('cruds.invoiceDerail.fields.product_helper') }}</span>
+                </select>
+                <span class="help-block">{{ trans('cruds.invoiceDerail.fields.product_helper') }}</span>
                     </div>
                 </div>
                 <div class="col-2">
@@ -404,75 +406,147 @@
                 </div>
             </div>
             `;
-            $('#invoice-rows').append(newRow);
-            rowCount++;
-            updateProductSelects();
-            toggleRemoveButtons();
-        });
+                $('#invoice-rows').append(newRow);
+                rowCount++;
+                updateProductSelects();
+                toggleRemoveButtons();
+            });
 
-        $(document).on('input', 'input[name="rate[]"], input[name="quantity[]"]', function() {
-            const row = $(this).closest('.invoice-row');
-            calculateAmount(row);
-            calculateTotals();
-        });
+            $(document).on('input', 'input[name="rate[]"], input[name="quantity[]"]', function() {
+                const row = $(this).closest('.invoice-row');
+                calculateAmount(row);
+                calculateTotals();
+            });
 
-        $(document).on('click', '.remove-row', function() {
-            const row = $(this).closest('.invoice-row');
-            const productId = row.find('[name="product_id[]"]').val();
-            selectedProducts = selectedProducts.filter(id => id !== productId);
-            row.remove();
-            rowCount--;
-            calculateTotals();
-            updateProductSelects();
-            toggleRemoveButtons();
-        });
+            $(document).on('click', '.remove-row', function() {
+                const row = $(this).closest('.invoice-row');
+                const productId = row.find('[name="product_id[]"]').val();
+                selectedProducts = selectedProducts.filter(id => id !== productId);
+                row.remove();
+                rowCount--;
+                calculateTotals();
+                updateProductSelects();
+                toggleRemoveButtons();
+            });
 
-        $(document).on('change', '[name="product_id[]"]', function() {
-            const productId = $(this).val();
-            const currentRow = $(this).closest('.invoice-row');
+            $(document).on('change', '[name="product_id[]"]', function() {
+                const productId = $(this).val();
+                const currentRow = $(this).closest('.invoice-row');
 
-            if (productId) {
-                const url = '{{ route("admin.product.info", ":product") }}'.replace(':product', productId);
+                if (productId) {
+                    const url = '{{ route("admin.product.info", ":product") }}'.replace(':product', productId);
 
-                $.ajax({
-                    url: url,
-                    type: 'GET',
-                    success: function(response) {
-                        if (response.price) {
-                            currentRow.find('input[name="rate[]"]').val(response.price).attr('readonly', true);
-                            currentRow.find('input[name="product_details[]"]').val(response.product_details);
+                    $.ajax({
+                        url: url,
+                        type: 'GET',
+                        success: function(response) {
+                            if (response.price) {
+                                currentRow.find('input[name="rate[]"]').val(response.price).attr('readonly', true);
+                                currentRow.find('input[name="product_details[]"]').val(response.product_details);
 
-                            calculateAmount(currentRow);
+                                calculateAmount(currentRow);
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error fetching product price:', error);
                         }
+                    });
+                }
+
+                const currentRowIndex = $(this).attr('id').split('_')[2];
+                if (!selectedProducts.includes(productId)) {
+                    selectedProducts.push(productId);
+                }
+                updateProductSelects();
+            });
+
+            $('#discount').on('change', function() {
+                discount = parseFloat($(this).val()) || 0;
+                calculateTotals();
+            });
+
+            $('#tax').on('change', function() {
+                tax = parseFloat($(this).val()) || 0;
+                calculateTotals();
+            });
+
+            $('#shipping_charge').on('change', function() {
+                shipping_charge = parseFloat($(this).val()) || 0;
+                calculateTotals();
+            });
+        });
+
+        $(document).ready(function() {
+            function fetchAddresses(clientId) {
+                if (clientId) {
+                    $.ajax({
+                        url: '{{ route("admin.add-invoice-masters.get.addresses", ":clientId") }}'.replace(':clientId', clientId),
+                        type: 'GET',
+                        success: function(response) {
+                            // Populate billing addresses
+                            $('#billing_address_id').empty().append('<option value="">{{ trans('global.pleaseSelect') }}</option>');
+                            $.each(response.billingAddresses, function(id, address) {
+                                $('#billing_address_id').append('<option value="' + id + '">' + address + '</option>');
+                            });
+
+                            // Populate shipping addresses
+                            $('#shipping_address_id').empty().append('<option value="">{{ trans('global.pleaseSelect') }}</option>');
+                            $.each(response.shippingAddresses, function(id, address) {
+                                $('#shipping_address_id').append('<option value="' + id + '">' + address + '</option>');
+                            });
+
+                            // If editing, preselect the current billing and shipping addresses
+                            $('#billing_address_id').val('{{ old("billing_address_id", $addInvoiceMaster->billing_address->id ?? "") }}');
+                            $('#shipping_address_id').val('{{ old("shipping_address_id", $addInvoiceMaster->shipping_address->id ?? "") }}');
+                        },
+                        error: function() {
+                            alert('Error loading addresses.');
+                        }
+                    });
+                }
+            }
+
+            // Fetch addresses on page load for the selected client
+            var selectedClientId = $('#select_client_id').val();
+            if (selectedClientId) {
+                fetchAddresses(selectedClientId);
+            }
+
+            // Update addresses when the client selection changes
+            $('#select_client_id').on('change', function() {
+                var clientId = $(this).val();
+                fetchAddresses(clientId);
+            });
+        });
+
+        $(document).ready(function() {
+            $('#inv_date').datetimepicker({
+                format: 'YYYY-MM-DD',
+                useCurrent: false
+            });
+
+            $('#inv_date input').val(moment().format('YYYY-MM-DD'));
+
+            function generateInvoiceNumber(date) {
+                $.ajax({
+                    url: "{{ route('admin.add-invoice-masters.generate.invoice.number') }}",
+                    type: 'GET',
+                    data: { date: date },
+                    success: function(response) {
+                        $('#invoice_number').val(response.invoice_number);
                     },
-                    error: function(xhr, status, error) {
-                        console.error('Error fetching product price:', error);
+                    error: function(xhr) {
+                        console.error('Error generating invoice number:', xhr);
                     }
                 });
             }
 
-            const currentRowIndex = $(this).attr('id').split('_')[2];
-            if (!selectedProducts.includes(productId)) {
-                selectedProducts.push(productId);
-            }
-            updateProductSelects();
-        });
 
-        $('#discount').on('change', function() {
-            discount = parseFloat($(this).val()) || 0;
-            calculateTotals();
+            $('#inv_date').on('dp.change', function(e) {
+                let selectedDate = e.date.format('YYYY-MM-DD');
+                console.log('Selected date:', selectedDate);
+                generateInvoiceNumber(selectedDate);
+            });
         });
-
-        $('#tax').on('change', function() {
-            tax = parseFloat($(this).val()) || 0;
-            calculateTotals();
-        });
-
-        $('#shipping_charge').on('change', function() {
-            shipping_charge = parseFloat($(this).val()) || 0;
-            calculateTotals();
-        });
-    });
-</script>
-
+    </script>
 @endsection

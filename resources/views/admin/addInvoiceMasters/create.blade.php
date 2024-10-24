@@ -14,6 +14,7 @@
                         <div class="form-group">
                             <label class="required" for="select_client_id">{{ trans('cruds.addInvoiceMaster.fields.select_client') }}</label>
                             <select class="form-control select2 {{ $errors->has('select_client') ? 'is-invalid' : '' }}" name="select_client_id" id="select_client_id" required>
+                                <option value="">{{ trans('global.pleaseSelect') }}</option>
                                 @foreach($select_clients as $id => $entry)
                                     <option value="{{ $id }}" {{ old('select_client_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
                                 @endforeach
@@ -29,7 +30,9 @@
                     <div class="col-lg-4 col-md-6 col-sm-12">
                         <div class="form-group">
                             <label class="required" for="invoice_number">{{ trans('cruds.addInvoiceMaster.fields.invoice_number') }}</label>
-                            <input class="form-control {{ $errors->has('invoice_number') ? 'is-invalid' : '' }}" type="text" name="invoice_number" id="invoice_number" value="{{ old('invoice_number', '') }}" required>
+                            <input class="form-control {{ $errors->has('invoice_number') ? 'is-invalid' : '' }}"
+                                   type="text" name="invoice_number" id="invoice_number"
+                                   value="{{ old('invoice_number', '') }}" readonly required>
                             @if($errors->has('invoice_number'))
                                 <div class="invalid-feedback">
                                     {{ $errors->first('invoice_number') }}
@@ -38,10 +41,12 @@
                             <span class="help-block">{{ trans('cruds.addInvoiceMaster.fields.invoice_number_helper') }}</span>
                         </div>
                     </div>
+
                     <div class="col-lg-4 col-md-6 col-sm-12">
                         <div class="form-group">
                             <label class="required" for="inv_date">{{ trans('cruds.addInvoiceMaster.fields.inv_date') }}</label>
-                            <input class="form-control date {{ $errors->has('inv_date') ? 'is-invalid' : '' }}" type="text" name="inv_date" id="inv_date" value="{{ old('inv_date') }}" required>
+                            <input class="form-control date {{ $errors->has('inv_date') ? 'is-invalid' : '' }}"
+                                   type="text" name="inv_date" id="inv_date" value="{{ old('inv_date', \Carbon\Carbon::now()->format('Y-m-d')) }}" required>
                             @if($errors->has('inv_date'))
                                 <div class="invalid-feedback">
                                     {{ $errors->first('inv_date') }}
@@ -70,9 +75,8 @@
                         <div class="form-group">
                             <label for="billing_address_id">{{ trans('cruds.addInvoiceMaster.fields.billing_address') }}</label>
                             <select class="form-control select2 {{ $errors->has('billing_address') ? 'is-invalid' : '' }}" name="billing_address_id" id="billing_address_id">
-                                @foreach($billing_addresses as $id => $entry)
-                                    <option value="{{ $id }}" {{ old('billing_address_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
-                                @endforeach
+                                <option value="">{{ trans('global.pleaseSelect') }}</option>
+                                <!-- Billing addresses will be loaded dynamically -->
                             </select>
                             @if($errors->has('billing_address'))
                                 <div class="invalid-feedback">
@@ -82,13 +86,13 @@
                             <span class="help-block">{{ trans('cruds.addInvoiceMaster.fields.billing_address_helper') }}</span>
                         </div>
                     </div>
+
                     <div class="col-lg-4 col-md-6 col-sm-12">
                         <div class="form-group">
                             <label class="required" for="shipping_address_id">{{ trans('cruds.addInvoiceMaster.fields.shipping_address') }}</label>
                             <select class="form-control select2 {{ $errors->has('shipping_address') ? 'is-invalid' : '' }}" name="shipping_address_id" id="shipping_address_id" required>
-                                @foreach($shipping_addresses as $id => $entry)
-                                    <option value="{{ $id }}" {{ old('shipping_address_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
-                                @endforeach
+                                <option value="">{{ trans('global.pleaseSelect') }}</option>
+                                <!-- Shipping addresses will be loaded dynamically -->
                             </select>
                             @if($errors->has('shipping_address'))
                                 <div class="invalid-feedback">
@@ -258,8 +262,9 @@
         </div>
     </div>
 
+@endsection
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+@section('scripts')
     <script>
         $(document).ready(function() {
             let rowCount = 1;
@@ -448,5 +453,78 @@
             });
         });
 
+        $(document).ready(function() {
+            function fetchAddresses(clientId) {
+                if (clientId) {
+                    $.ajax({
+                        url: '{{ route("admin.add-invoice-masters.get.addresses", ":clientId") }}'.replace(':clientId', clientId),
+                        type: 'GET',
+                        success: function(response) {
+                            // Populate billing addresses
+                            $('#billing_address_id').empty().append('<option value="">{{ trans('global.pleaseSelect') }}</option>');
+                            $.each(response.billingAddresses, function(id, address) {
+                                $('#billing_address_id').append('<option value="' + id + '">' + address + '</option>');
+                            });
+
+                            // Populate shipping addresses
+                            $('#shipping_address_id').empty().append('<option value="">{{ trans('global.pleaseSelect') }}</option>');
+                            $.each(response.shippingAddresses, function(id, address) {
+                                $('#shipping_address_id').append('<option value="' + id + '">' + address + '</option>');
+                            });
+
+                            // If editing, preselect the current billing and shipping addresses
+                            $('#billing_address_id').val('{{ old("billing_address_id", $addInvoiceMaster->billing_address->id ?? "") }}');
+                            $('#shipping_address_id').val('{{ old("shipping_address_id", $addInvoiceMaster->shipping_address->id ?? "") }}');
+                        },
+                        error: function() {
+                            alert('Error loading addresses.');
+                        }
+                    });
+                }
+            }
+
+            // Fetch addresses on page load for the selected client
+            var selectedClientId = $('#select_client_id').val();
+            if (selectedClientId) {
+                fetchAddresses(selectedClientId);
+            }
+
+            // Update addresses when the client selection changes
+            $('#select_client_id').on('change', function() {
+                var clientId = $(this).val();
+                fetchAddresses(clientId);
+            });
+        });
+
+        $(document).ready(function() {
+            $('#inv_date').datetimepicker({
+                format: 'YYYY-MM-DD',
+                useCurrent: false
+            });
+
+            $('#inv_date input').val(moment().format('YYYY-MM-DD'));
+
+            function generateInvoiceNumber(date) {
+                $.ajax({
+                    url: "{{ route('admin.add-invoice-masters.generate.invoice.number') }}",
+                    type: 'GET',
+                    data: { date: date },
+                    success: function(response) {
+                        $('#invoice_number').val(response.invoice_number);
+                    },
+                    error: function(xhr) {
+                        console.error('Error generating invoice number:', xhr);
+                    }
+                });
+            }
+
+            generateInvoiceNumber(moment().format('YYYY-MM-DD'));
+
+            $('#inv_date').on('dp.change', function(e) {
+                let selectedDate = e.date.format('YYYY-MM-DD');
+                console.log('Selected date:', selectedDate);
+                generateInvoiceNumber(selectedDate);
+            });
+        });
     </script>
 @endsection

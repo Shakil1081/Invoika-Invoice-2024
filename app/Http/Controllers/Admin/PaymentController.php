@@ -56,7 +56,7 @@ class PaymentController extends Controller
         return view('admin.makePayment.paymentConfirmation', compact('amount','invoice'));
     }
 
-    private function createPaymentRecord($invoiceId, $amount, $paymentMethod, $paymentTransactionId = null,$pdfPath = null)
+    private function createPaymentRecord($invoiceId, $amount, $paymentMethod, $paymentTransactionId = null)
     {
         $invoice = AddInvoiceMaster::find($invoiceId);
         $dueAmount = $invoice->total_amount - $invoice->payments->sum('amount_paid') - $amount;
@@ -69,7 +69,6 @@ class PaymentController extends Controller
             'payment_method' => $paymentMethod,
             'transaction_id' => $transactionId,
             'payment_transaction_id' => $paymentTransactionId,
-            'invoice_path' => $pdfPath,
         ]);
     }
 
@@ -87,11 +86,9 @@ class PaymentController extends Controller
             ]);
 
             if ($payment->status === 'succeeded') {
-                $filePath = $this->generateInvoicePDF($invoice, $amount, $payment->id);
+                $this->createPaymentRecord($invoice->id, $amount, 'Card', $payment->id);
 
-                $this->createPaymentRecord($invoice->id, $amount, 'Card', $payment->id,$filePath);
-
-                return response()->download($filePath)->deleteFileAfterSend(true);
+                return redirect()->route('admin.invoice.list');
             } else {
 
                 return redirect()->route('admin.invoice.list')->with('error', 'Payment failed: ' . $payment->failure_message);
@@ -105,20 +102,22 @@ class PaymentController extends Controller
         }
     }
 
-    private function generateInvoicePDF(AddInvoiceMaster $invoice, $amount, $transactionId)
+    public function paymentVouchers($invoiceId)
     {
-        $data = [
-            'invoice' => $invoice,
-            'amount' => $amount,
-            'transactionId' => $transactionId,
-        ];
+        $payments = Payment::where('invoice_id',$invoiceId)->get();
+        return view('admin.makePayment.paymentVouchers', compact('payments'));
+    }
 
-        $pdf = PDF::loadView('pdf.invoice', $data);
+    public function paymentVoucherDownload($id)
+    {
+        $payment = Payment::with('addInvoiceMaster')->find($id);
 
-        $fileName = 'invoice_' . $invoice->id . '_' . time() . '.pdf';
+        $pdf = PDF::loadView('pdf.payment_voucher', $payment);
+
+        $fileName = 'invoice_' . $payment->addInvoiceMaster->invoice_number . '_' . time() . '.pdf';
         $filePath = storage_path('app/invoices/' . $fileName);
 
-        $pdf->save($filePath);
+        $pdf->download($fileName);
 
         return $filePath;
     }

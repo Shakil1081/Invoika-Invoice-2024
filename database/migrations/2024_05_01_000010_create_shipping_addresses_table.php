@@ -10,10 +10,12 @@ class CreateShippingAddressesTable extends Migration
     {
         Schema::create('shipping_addresses', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->unsignedBigInteger('company_id');
             $table->string('shipping_name');
             $table->longText('shippling_address')->nullable();
             $table->string('shippling_mobile_number');
             $table->string('shippling_tax_number')->nullable();
+            $table->string('status')->default('Active');
             $table->timestamps();
             $table->softDeletes();
         });

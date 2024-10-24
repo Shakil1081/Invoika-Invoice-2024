@@ -8,6 +8,7 @@ use App\Http\Requests\MassDestroyBillingAddressRequest;
 use App\Http\Requests\StoreBillingAddressRequest;
 use App\Http\Requests\UpdateBillingAddressRequest;
 use App\Models\BillingAddress;
+use App\Models\CompanyList;
 use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,7 +23,7 @@ class BillingAddressController extends Controller
         abort_if(Gate::denies('billing_address_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         if ($request->ajax()) {
-            $query = BillingAddress::query()->select(sprintf('%s.*', (new BillingAddress)->table));
+            $query = BillingAddress::with('company')->select(sprintf('%s.*', (new BillingAddress)->table));
             $table = Datatables::of($query);
 
             $table->addColumn('placeholder', '&nbsp;');
@@ -43,6 +44,9 @@ class BillingAddressController extends Controller
                 ));
             });
 
+            $table->addColumn('company_name', function ($row) {
+                return $row->company ? $row->company->company_name : '';
+            });
             $table->editColumn('full_name', function ($row) {
                 return $row->full_name ? $row->full_name : '';
             });
@@ -67,8 +71,8 @@ class BillingAddressController extends Controller
     public function create()
     {
         abort_if(Gate::denies('billing_address_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-
-        return view('admin.billingAddresses.create');
+        $companies = CompanyList::pluck('company_name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        return view('admin.billingAddresses.create',compact('companies'));
     }
 
     public function store(StoreBillingAddressRequest $request)
@@ -81,8 +85,8 @@ class BillingAddressController extends Controller
     public function edit(BillingAddress $billingAddress)
     {
         abort_if(Gate::denies('billing_address_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-
-        return view('admin.billingAddresses.edit', compact('billingAddress'));
+        $companies = CompanyList::pluck('company_name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        return view('admin.billingAddresses.edit', compact('billingAddress','companies'));
     }
 
     public function update(UpdateBillingAddressRequest $request, BillingAddress $billingAddress)

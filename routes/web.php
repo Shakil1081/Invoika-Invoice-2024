@@ -34,7 +34,9 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     // Add Invoice Master
     Route::delete('add-invoice-masters/destroy', 'AddInvoiceMasterController@massDestroy')->name('add-invoice-masters.massDestroy');
 //    Route::get('add-invoice-masters/create-with-details', 'AddInvoiceMasterController@createWithDetails')->name('add-invoice-masters.create.with.details');
+    Route::get('add-invoice-masters/get-addresses/{clientId}', 'AddInvoiceMasterController@getAddresses')->name('add-invoice-masters.get.addresses');
     Route::get('add-invoice-masters/generate-pdf/{addInvoiceMaster}', 'AddInvoiceMasterController@generateInvoicePDF')->name('add-invoice-masters.generate-pdf');
+    Route::get('add-invoice-masters/generate-invoice-number', 'AddInvoiceMasterController@generateInvoiceNumber')->name('add-invoice-masters.generate.invoice.number');
 
     Route::resource('add-invoice-masters', 'AddInvoiceMasterController');
 
@@ -111,9 +113,10 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::get('/invoices', 'PaymentController@showInvoiceList')->name('invoice.list');
     Route::get('/invoices/{invoice}/payment', 'PaymentController@showPaymentPage')->name('invoice.payment');
     Route::post('/invoices/{invoice}/payment', 'PaymentController@processPayment')->name('invoice.processPayment');
-
     Route::get('invoices/payment-make/{invoice}', 'PaymentController@paymentMakePage')->name('payment.confirmation');
     Route::post('/invoices/{amount}/{invoice}/finalize', 'PaymentController@finalizePayment')->name('invoice.finalizePayment');
+    Route::get('invoices/payment-vouchers/{invoice}', 'PaymentController@paymentVouchers')->name('invoice.paymentVouchers');
+    Route::get('invoices/payment-voucher/download/{id}', 'PaymentController@paymentVoucherDownload')->name('invoice.paymentVouchers.download');
 });
 Route::group(['prefix' => 'profile', 'as' => 'profile.', 'namespace' => 'Auth', 'middleware' => ['auth']], function () {
     // Change password

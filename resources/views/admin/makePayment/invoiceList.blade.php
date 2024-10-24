@@ -55,7 +55,7 @@
                             <td>{{ $invoice->total_amount }}</td>
                             <td>{{ $invoice->payments->sum('amount_paid') ?? 0 }}</td>
                             <td>{{ $invoice->total_amount - $invoice->payments->sum('amount_paid') ?? 0 }}</td>
-                            <td>
+                            <td width="15%">
                                 @if($invoice->total_amount - $invoice->payments->sum('amount_paid') > 0)
                                     <a class="btn btn-xs btn-primary" href="{{ route('admin.invoice.payment', $invoice->id) }}">
                                         Make Payment
@@ -63,6 +63,10 @@
                                 @else
                                     <span class="badge badge-info">Paid</span>
                                 @endif
+
+                                <a class="btn btn-xs btn-success" href="{{ route('admin.invoice.paymentVouchers', $invoice->id) }}">
+                                    Payment Vouchers
+                                </a>
                             </td>
 
                         </tr>

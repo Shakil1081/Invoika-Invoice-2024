@@ -26,6 +26,9 @@
 
                     </th>
                     <th>
+                        {{ trans('cruds.billingAddress.fields.company_id') }}
+                    </th>
+                    <th>
                         {{ trans('cruds.billingAddress.fields.full_name') }}
                     </th>
                     <th>
@@ -93,6 +96,7 @@
     ajax: "{{ route('admin.billing-addresses.index') }}",
     columns: [
       { data: 'placeholder', name: 'placeholder' },
+{ data: 'company_name', name: 'company.company_name' },
 { data: 'full_name', name: 'full_name' },
 { data: 'billing_address', name: 'billing_address' },
 { data: 'billing_mobile_number', name: 'billing_mobile_number' },
@@ -108,7 +112,7 @@
       $($.fn.dataTable.tables(true)).DataTable()
           .columns.adjust();
   });
-  
+
 });
 
 </script>

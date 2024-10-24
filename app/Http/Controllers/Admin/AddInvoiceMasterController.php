@@ -57,9 +57,9 @@ class AddInvoiceMasterController extends Controller
 
         $payment_statuses = PaymentStatus::pluck('payment_status', 'id')->prepend(trans('global.pleaseSelect'), '');
 
-        $billing_addresses = BillingAddress::pluck('full_name', 'id')->prepend(trans('global.pleaseSelect'), '');
-
-        $shipping_addresses = ShippingAddress::pluck('shipping_name', 'id')->prepend(trans('global.pleaseSelect'), '');
+//        $billing_addresses = BillingAddress::pluck('full_name', 'id')->prepend(trans('global.pleaseSelect'), '');
+//
+//        $shipping_addresses = ShippingAddress::pluck('shipping_name', 'id')->prepend(trans('global.pleaseSelect'), '');
 
         $products = Product::pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $discounts = Discount::all()->map(function($discount) {
@@ -85,7 +85,7 @@ class AddInvoiceMasterController extends Controller
             ];
         })->prepend(['id' => '', 'tax_name' => trans('global.pleaseSelect'), 'tax_rate_in' => '']);
 
-        return view('admin.addInvoiceMasters.create', compact('billing_addresses', 'payment_statuses', 'select_clients', 'shipping_addresses','products','discounts','taxes','shippingCharges'));
+        return view('admin.addInvoiceMasters.create', compact( 'payment_statuses', 'select_clients', 'products','discounts','taxes','shippingCharges'));
     }
 
 //    public function store(StoreAddInvoiceMasterRequest $request)
@@ -254,5 +254,39 @@ class AddInvoiceMasterController extends Controller
 
         return response(null, Response::HTTP_NO_CONTENT);
     }
+
+    public function getAddresses($clientId)
+    {
+        $billingAddresses = BillingAddress::where('company_id', $clientId)->pluck('full_name', 'id');
+        $shippingAddresses = ShippingAddress::where('company_id', $clientId)->pluck('shipping_name', 'id');
+
+        return response()->json([
+            'billingAddresses' => $billingAddresses,
+            'shippingAddresses' => $shippingAddresses,
+        ]);
+    }
+
+    public function generateInvoiceNumber(Request $request)
+    {
+        $date = \Carbon\Carbon::parse($request->date)->format('Ymd');
+
+        $latestInvoice = AddInvoiceMaster::whereDate('created_at', $request->date)
+            ->orderBy('id', 'desc')
+            ->first();
+
+        $counter = '0001';
+
+        if ($latestInvoice) {
+            $lastInvoiceNumber = $latestInvoice->invoice_number;
+            $lastCounter = (int)substr($lastInvoiceNumber, -4);
+
+            $counter = str_pad($lastCounter + 1, 4, '0', STR_PAD_LEFT);
+        }
+
+        $invoiceNumber = 'INV-' . $date . $counter;
+
+        return response()->json(['invoice_number' => $invoiceNumber]);
+    }
+
 
 }

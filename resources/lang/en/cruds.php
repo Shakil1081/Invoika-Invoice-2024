@@ -195,6 +195,8 @@ return [
         'fields'         => [
             'id'                           => 'ID',
             'id_helper'                    => ' ',
+            'company_id'                   => 'Company Name',
+            'company_id_helper'            => ' ',
             'full_name'                    => 'Full Name',
             'full_name_helper'             => ' ',
             'billing_address'              => 'Billing Address',
@@ -217,6 +219,8 @@ return [
         'fields'         => [
             'id'                             => 'ID',
             'id_helper'                      => ' ',
+            'company_id'                   => 'Company Name',
+            'company_id_helper'            => ' ',
             'shipping_name'                  => 'Full Name',
             'shipping_name_helper'           => ' ',
             'shippling_address'              => 'Shippling Address',

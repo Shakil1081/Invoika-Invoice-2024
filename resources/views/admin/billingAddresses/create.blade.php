@@ -10,7 +10,25 @@
         <form method="POST" action="{{ route("admin.billing-addresses.store") }}" enctype="multipart/form-data">
             @csrf
             <div class="row">
-                <div class="col-lg-4 col-md-6 col-sm-12">
+                <div class="col-lg-3 col-md-6 col-sm-12">
+                    <div class="form-group">
+                        <label for="company_id">{{ trans('cruds.billingAddress.fields.company_id') }}</label>
+                        <select class="form-control select2 {{ $errors->has('company_id') ? 'is-invalid' : '' }}" name="company_id" id="company_id" required>
+                            @foreach($companies as $id => $entry)
+                                <option value="{{ $id }}" {{ old('company_id') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                            @endforeach
+                        </select>
+                        @if($errors->has('company_id'))
+                            <div class="invalid-feedback">
+                                {{ $errors->first('company_id') }}
+                            </div>
+                        @endif
+{{--                        <span class="help-block">{{ trans('cruds.billingAddress.fields.company_id') }}</span>--}}
+                    </div>
+                </div>
+
+
+                <div class="col-lg-3 col-md-6 col-sm-12">
                     <div class="form-group">
                         <label class="required" for="full_name">{{ trans('cruds.billingAddress.fields.full_name') }}</label>
                         <input class="form-control {{ $errors->has('full_name') ? 'is-invalid' : '' }}" type="text" name="full_name" id="full_name" value="{{ old('full_name', '') }}" required>
@@ -22,7 +40,7 @@
                         <span class="help-block">{{ trans('cruds.billingAddress.fields.full_name_helper') }}</span>
                     </div>
                 </div>
-                <div class="col-lg-4 col-md-6 col-sm-12">
+                <div class="col-lg-3 col-md-6 col-sm-12">
                     <div class="form-group">
                         <label class="required" for="billing_mobile_number">{{ trans('cruds.billingAddress.fields.billing_mobile_number') }}</label>
                         <input class="form-control {{ $errors->has('billing_mobile_number') ? 'is-invalid' : '' }}" type="text" name="billing_mobile_number" id="billing_mobile_number" value="{{ old('billing_mobile_number', '') }}" required>
@@ -34,7 +52,7 @@
                         <span class="help-block">{{ trans('cruds.billingAddress.fields.billing_mobile_number_helper') }}</span>
                     </div>
                 </div>
-                <div class="col-lg-4 col-md-6 col-sm-12">
+                <div class="col-lg-3 col-md-6 col-sm-12">
                     <div class="form-group">
                         <label for="billing_tax_number">{{ trans('cruds.billingAddress.fields.billing_tax_number') }}</label>
                         <input class="form-control {{ $errors->has('billing_tax_number') ? 'is-invalid' : '' }}" type="text" name="billing_tax_number" id="billing_tax_number" value="{{ old('billing_tax_number', '') }}">

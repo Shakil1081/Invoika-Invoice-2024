@@ -11,7 +11,23 @@
             @method('PUT')
             @csrf
             <div class="row">
-                <div class="col-lg-4 col-md-6 col-sm-12">
+                <div class="col-lg-3 col-md-6 col-sm-12">
+                    <div class="form-group">
+                        <label for="company_id">{{ trans('cruds.billingAddress.fields.company_id') }}</label>
+                        <select class="form-control select2 {{ $errors->has('company_id') ? 'is-invalid' : '' }}" name="company_id" id="company_id" required>
+                            @foreach($companies as $id => $entry)
+                                <option value="{{ $id }}" {{ $shippingAddress->company_id == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                            @endforeach
+                        </select>
+                        @if($errors->has('company_id'))
+                            <div class="invalid-feedback">
+                                {{ $errors->first('company_id') }}
+                            </div>
+                        @endif
+                        {{-- <span class="help-block">{{ trans('cruds.billingAddress.fields.company_id') }}</span>--}}
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-12">
                     <div class="form-group">
                         <label class="required" for="shipping_name">{{ trans('cruds.shippingAddress.fields.shipping_name') }}</label>
                         <input class="form-control {{ $errors->has('shipping_name') ? 'is-invalid' : '' }}" type="text" name="shipping_name" id="shipping_name" value="{{ old('shipping_name', $shippingAddress->shipping_name) }}" required>
@@ -23,7 +39,7 @@
                         <span class="help-block">{{ trans('cruds.shippingAddress.fields.shipping_name_helper') }}</span>
                     </div>
                 </div>
-                <div class="col-lg-4 col-md-6 col-sm-12">
+                <div class="col-lg-3 col-md-6 col-sm-12">
                     <div class="form-group">
                         <label class="required" for="shippling_mobile_number">{{ trans('cruds.shippingAddress.fields.shippling_mobile_number') }}</label>
                         <input class="form-control {{ $errors->has('shippling_mobile_number') ? 'is-invalid' : '' }}" type="text" name="shippling_mobile_number" id="shippling_mobile_number" value="{{ old('shippling_mobile_number', $shippingAddress->shippling_mobile_number) }}" required>
@@ -35,7 +51,7 @@
                         <span class="help-block">{{ trans('cruds.shippingAddress.fields.shippling_mobile_number_helper') }}</span>
                     </div>
                 </div>
-                <div class="col-lg-4 col-md-6 col-sm-12">
+                <div class="col-lg-3 col-md-6 col-sm-12">
                     <div class="form-group">
                         <label for="shippling_tax_number">{{ trans('cruds.shippingAddress.fields.shippling_tax_number') }}</label>
                         <input class="form-control {{ $errors->has('shippling_tax_number') ? 'is-invalid' : '' }}" type="text" name="shippling_tax_number" id="shippling_tax_number" value="{{ old('shippling_tax_number', $shippingAddress->shippling_tax_number) }}">

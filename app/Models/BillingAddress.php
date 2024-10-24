@@ -21,6 +21,7 @@ class BillingAddress extends Model
     ];
 
     protected $fillable = [
+        'company_id',
         'full_name',
         'billing_address',
         'billing_mobile_number',
@@ -33,5 +34,9 @@ class BillingAddress extends Model
     protected function serializeDate(DateTimeInterface $date)
     {
         return $date->format('Y-m-d H:i:s');
+    }
+
+    public function company(){
+        return $this->belongsTo(CompanyList::class, 'company_id');
     }
 }

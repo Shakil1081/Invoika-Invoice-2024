@@ -21,6 +21,7 @@ class ShippingAddress extends Model
     ];
 
     protected $fillable = [
+        'company_id',
         'shipping_name',
         'shippling_address',
         'shippling_mobile_number',
@@ -33,5 +34,9 @@ class ShippingAddress extends Model
     protected function serializeDate(DateTimeInterface $date)
     {
         return $date->format('Y-m-d H:i:s');
+    }
+
+    public function company(){
+        return $this->belongsTo(CompanyList::class, 'company_id');
     }
 }

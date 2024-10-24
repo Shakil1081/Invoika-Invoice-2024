@@ -17,6 +17,7 @@ class BillingAddressSeeder extends Seeder
     {
         $data = [
             [
+                'company_id' => 1,
                 'full_name' => 'John Doe',
                 'billing_address' => '123 Main St, Anytown, USA',
                 'billing_mobile_number' => '1234567890',
@@ -25,6 +26,7 @@ class BillingAddressSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
+                'company_id' => 2,
                 'full_name' => 'Jane Smith',
                 'billing_address' => '456 Elm St, Othertown, USA',
                 'billing_mobile_number' => '0987654321',

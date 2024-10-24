@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('payment_method');
             $table->string('transaction_id')->nullable();
             $table->string('payment_transaction_id')->nullable();
-            $table->string('invoice_path')->nullable();
+//            $table->string('invoice_path')->nullable();
             $table->timestamps();
 
             $table->foreign('invoice_id')->references('id')->on('add_invoice_masters')->onDelete('cascade');
